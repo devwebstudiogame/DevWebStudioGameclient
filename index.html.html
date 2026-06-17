@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevWeb Studio Game – Développeur Web & Créateur de Jeux HTML5</title>
+  <meta name="description" content="Je crée des sites web modernes, rapides et responsives ainsi que des jeux HTML5 sur mesure, entièrement codés à la main." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #0A0B14;
+      --bg2:      #111827;
+      --bg3:      #1a2035;
+      --cyan:     #00E5FF;
+      --violet:   #8B5CF6;
+      --white:    #F0F4FF;
+      --muted:    #7B8DAE;
+      --green:    #22c55e;
+      --blue:     #3b82f6;
+      --red:      #ef4444;
+      --gold:     #f59e0b;
+      --radius:   12px;
+      --font-display: 'Orbitron', sans-serif;
+      --font-body:    'Inter', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; }
+    ::selection { background: var(--cyan); color: var(--bg); }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 3px; }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw;
+      height: 64px;
+      background: rgba(10,11,20,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,229,255,0.08);
+      transition: background 0.3s;
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--cyan);
+    }
+    .nav-logo span { color: var(--violet); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-cta {
+      padding: 0.45rem 1.1rem;
+      background: transparent;
+      border: 1px solid var(--cyan);
+      border-radius: 6px;
+      color: var(--cyan) !important;
+      font-size: 0.82rem !important;
+      font-weight: 600 !important;
+      transition: background 0.2s, color 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--cyan); color: var(--bg) !important; }
+
+    /* hamburger */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--cyan); transition: all 0.3s; border-radius: 2px; }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 100px 5vw 60px;
+      overflow: hidden;
+    }
+    #canvas-bg {
+      position: absolute; inset: 0;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+    .hero-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,92,246,0.22) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 780px; }
+    .hero-badge {
+      display: inline-block;
+      padding: 0.35rem 1rem;
+      border: 1px solid rgba(0,229,255,0.3);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 1.8rem;
+      background: rgba(0,229,255,0.05);
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5.5vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.4rem;
+    }
+    .hero-title .accent-cyan { color: var(--cyan); }
+    .hero-title .accent-violet { color: var(--violet); }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 2.4rem;
+    }
+    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 1.8rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .btn-primary {
+      background: var(--cyan);
+      color: var(--bg);
+    }
+    .btn-primary:hover { background: transparent; border-color: var(--cyan); color: var(--cyan); transform: translateY(-2px); }
+    .btn-secondary {
+      background: transparent;
+      border-color: rgba(139,92,246,0.6);
+      color: var(--violet);
+    }
+    .btn-secondary:hover { background: var(--violet); color: #fff; transform: translateY(-2px); }
+    .hero-scroll {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+      color: var(--muted); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      animation: bounce 2s infinite;
+    }
+    .hero-scroll::after {
+      content: '';
+      display: block; width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--muted), transparent);
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── SECTIONS ── */
+    section { padding: 100px 5vw; }
+    .section-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 0.8rem;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1.2rem;
+    }
+    .section-lead {
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 3rem;
+      font-size: 1.02rem;
+    }
+
+    /* ── ABOUT ── */
+    #about { background: var(--bg2); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      max-width: 1100px; margin: 0 auto;
+    }
+    .about-visual {
+      position: relative;
+    }
+    .about-code-block {
+      background: var(--bg3);
+      border: 1px solid rgba(0,229,255,0.12);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      line-height: 2;
+      color: var(--muted);
+    }
+    .about-code-block .kw  { color: var(--violet); }
+    .about-code-block .fn  { color: var(--cyan); }
+    .about-code-block .str { color: var(--green); }
+    .about-code-block .num { color: var(--gold); }
+    .about-tags {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem;
+    }
+    .tag {
+      padding: 0.3rem 0.8rem;
+      background: rgba(139,92,246,0.12);
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: 100px;
+      font-size: 0.78rem;
+      color: var(--violet);
+    }
+    .about-stats {
+      display: flex; gap: 2rem; margin-top: 2.5rem; flex-wrap: wrap;
+    }
+    .stat-item { text-align: left; }
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+    .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+
+    /* ── OFFERS ── */
+    #offres { background: var(--bg); }
+    .offers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .offer-card {
+      background: var(--bg2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 2rem 1.8rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      cursor: default;
+    }
+    .offer-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 0%, var(--accent-color, #00E5FF) 0%, transparent 65%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .offer-card:hover { transform: translateY(-6px); border-color: var(--accent-color, var(--cyan)); box-shadow: 0 0 32px rgba(0,229,255,0.12); }
+    .offer-card:hover::before { opacity: 0.07; }
+    .offer-card.featured {
+      border-color: var(--accent-color, var(--cyan));
+      box-shadow: 0 0 24px rgba(0,229,255,0.1);
+    }
+    .offer-badge {
+      display: inline-block;
+      padding: 0.25rem 0.7rem;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      background: var(--accent-color, var(--cyan));
+      color: var(--bg);
+    }
+    .offer-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.04em;
+    }
+    .offer-price {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--accent-color, var(--cyan));
+      margin-bottom: 0.3rem;
+    }
+    .offer-price span { font-size: 1rem; font-weight: 400; color: var(--muted); }
+    .offer-delay {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 1.4rem;
+      display: flex; align-items: center; gap: 0.35rem;
+    }
+    .offer-delay::before { content: '⏱'; }
+    .offer-features {
+      list-style: none;
+      margin-bottom: 1.8rem;
+      display: flex; flex-direction: column; gap: 0.55rem;
+    }
+    .offer-features li {
+      font-size: 0.88rem;
+      color: var(--muted);
+      display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .offer-features li::before {
+      content: '✔';
+      color: var(--accent-color, var(--cyan));
+      font-size: 0.75rem;
+      margin-top: 0.15rem;
+      flex-shrink: 0;
+    }
+    .offer-ideal {
+      font-size: 0.78rem;
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 1rem;
+      margin-top: auto;
+    }
+    .offer-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 0.7rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      border: 1.5px solid var(--accent-color, var(--cyan));
+      color: var(--accent-color, var(--cyan));
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .offer-btn:hover { background: var(--accent-color, var(--cyan)); color: var(--bg); }
+
+    /* ── OPTIONS ── */
+    #options { background: var(--bg2); }
+    .options-wrap { max-width: 800px; margin: 0 auto; }
+    .options-list {
+      display: flex; flex-direction: column; gap: 1px;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .option-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.1rem 1.5rem;
+      background: var(--bg3);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.2s;
+    }
+    .option-row:last-child { border-bottom: none; }
+    .option-row:hover { background: rgba(0,229,255,0.04); }
+    .option-name { font-size: 0.92rem; font-weight: 500; }
+    .option-price {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cyan);
+      white-space: nowrap;
+    }
+    .option-delay { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+
+    /* ── PROCESS ── */
+    #process { background: var(--bg); }
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      max-width: 1000px; margin: 0 auto;
+      position: relative;
+    }
+    .process-step {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      background: var(--bg2);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .process-step:hover { border-color: var(--cyan); transform: translateY(-4px); }
+    .process-icon {
+      width: 56px; height: 56px;
+      margin: 0 auto 1rem;
+      background: rgba(0,229,255,0.08);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+    }
+    .process-num {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 0.15em;
+      margin-bottom: 0.5rem;
+    }
+    .process-title {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .process-desc { font-size: 0.82rem; color: var(--muted); }
+
+    /* ── CONTACT ── */
+    #contact { background: var(--bg2); }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 4rem;
+      align-items: start;
+      max-width: 1000px; margin: 0 auto;
+    }
+    .contact-info-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+    .contact-icon {
+      width: 44px; height: 44px;
+      background: rgba(0,229,255,0.08);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .contact-info-title { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.15rem; }
+    .contact-info-val { font-weight: 500; font-size: 0.95rem; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.04em;
+    }
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg3);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-control:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0,229,255,0.1);
+    }
+    textarea.form-control { resize: vertical; min-height: 130px; }
+    select.form-control { cursor: pointer; }
+    select.form-control option { background: var(--bg3); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-submit {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--cyan);
+      color: var(--bg);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: all 0.2s;
+      font-family: var(--font-body);
+      margin-top: 0.5rem;
+    }
+    .form-submit:hover { background: #00c8e0; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,229,255,0.25); }
+    #form-msg {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+    }
+    #form-msg.success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: var(--green); }
+    #form-msg.error   { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: var(--red); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 2.5rem 5vw;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+    .footer-logo span { color: var(--violet); }
+    .footer-copy { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── ANIMATIONS ── */
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; flex-direction: column; position: fixed; top: 64px; left: 0; right: 0; background: rgba(10,11,20,0.97); padding: 2rem; gap: 1.5rem; border-bottom: 1px solid rgba(0,229,255,0.1); }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .about-visual { order: -1; }
+    }
+    @media (max-width: 480px) {
+      .offers-grid { grid-template-columns: 1fr; }
+      .process-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 360px) {
+      .process-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── FOCUS VISIBLE ── */
+    :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+    /* ── REDUCED MOTION ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      #canvas-bg { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo">Dev<span>Web</span>Studio Game</div>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#about">À propos</a></li>
+    <li><a href="#offres">Offres</a></li>
+    <li><a href="#options">Options</a></li>
+    <li><a href="#process">Processus</a></li>
+    <li><a href="#contact" class="nav-cta">Devis gratuit</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" aria-label="Menu" role="button" tabindex="0">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="canvas-bg"></canvas>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🚀 Développeur Web & Créateur de Jeux HTML5</div>
+    <h1 class="hero-title">
+      Sites modernes.<br>
+      <span class="accent-cyan">Jeux HTML5</span> sur&nbsp;<span class="accent-violet">mesure.</span>
+    </h1>
+    <p class="hero-sub">
+      Je crée des sites web rapides et responsives ainsi que des jeux HTML5 entièrement codés à la main. Code propre, résultats concrets.
+    </p>
+    <div class="hero-actions">
+      <a href="#offres" class="btn btn-primary">Voir les offres</a>
+      <a href="#contact" class="btn btn-secondary">Devis gratuit</a>
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-text fade-in">
+      <p class="section-eyebrow">À propos</p>
+      <h2 class="section-title">Code&nbsp;fait&nbsp;main.<br>Résultats&nbsp;concrets.</h2>
+      <p style="color:var(--muted); margin-bottom:1.5rem;">
+        Passionné par le web et les jeux vidéo, je développe chaque projet de zéro — pas de templates, pas de page-builders. Du code propre, optimisé et 100&nbsp;% personnalisé.
+      </p>
+      <p style="color:var(--muted);">
+        Que vous ayez besoin d'une landing page percutante, d'un site vitrine professionnel ou d'un mini-jeu HTML5 pour engager votre audience, je livre dans les délais avec une qualité irréprochable.
+      </p>
+      <div class="about-tags">
+        <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span>
+        <span class="tag">Canvas API</span><span class="tag">SEO</span><span class="tag">Responsive</span>
+        <span class="tag">Performance</span><span class="tag">Accessibilité</span>
+      </div>
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Code fait main</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">2–14j</div>
+          <div class="stat-label">Délai de livraison</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">4</div>
+          <div class="stat-label">Packs disponibles</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-visual fade-in">
+      <div class="about-code-block">
+        <div><span class="kw">const</span> studio = {</div>
+        <div>&nbsp;&nbsp;<span class="fn">name</span>: <span class="str">"DevWeb Studio Game"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="fn">skills</span>: [</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"HTML5"</span>, <span class="str">"CSS3"</span>, <span class="str">"JavaScript"</span>,</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"Canvas API"</span>, <span class="str">"SEO"</span></div>
+        <div>&nbsp;&nbsp;],</div>
+        <div>&nbsp;&nbsp;<span class="fn">handcoded</span>: <span class="kw">true</span>,</div>
+        <div>&nbsp;&nbsp;<span class="fn">quality</span>: <span class="str">"premium"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="fn">deliver</span>: <span class="kw">async</span> (project) => {</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return await</span> <span class="fn">build</span>(</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;project, <span class="str">"on-time"</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;);</div>
+        <div>&nbsp;&nbsp;}</div>
+        <div>};</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFERS -->
+<section id="offres">
+  <div style="text-align:center; max-width:600px; margin:0 auto 3.5rem;">
+    <p class="section-eyebrow">Mes offres</p>
+    <h2 class="section-title">Choisissez votre pack</h2>
+    <p class="section-lead" style="margin:0 auto;">Du site vitrine au jeu HTML5 complet, un pack adapté à chaque projet et chaque budget.</p>
+  </div>
+  <div class="offers-grid">
+
+    <!-- STARTER -->
+    <div class="offer-card fade-in" style="--accent-color:#22c55e;">
+      <div class="offer-badge" style="background:#22c55e;">Starter</div>
+      <div class="offer-name">🟢 Pack Starter</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:0.6rem;">Site vitrine simple</div>
+      <div class="offer-price">199 €<span> HT</span></div>
+      <div class="offer-delay">Délai : 3 à 5 jours</div>
+      <ul class="offer-features">
+        <li>1 page (landing page ou site simple)</li>
+        <li>Design moderne et responsive</li>
+        <li>Formulaire de contact</li>
+        <li>Mise en ligne basique</li>
+        <li>Code 100&nbsp;% personnalisé</li>
+      </ul>
+      <a href="#contact" class="offer-btn">Choisir ce pack</a>
+      <p class="offer-ideal">👉 Idéal pour artisans, projets perso, petites activités.</p>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="offer-card fade-in" style="--accent-color:#3b82f6;">
+      <div class="offer-badge" style="background:#3b82f6;">Business</div>
+      <div class="offer-name">🔵 Pack Business</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:0.6rem;">Site professionnel</div>
+      <div class="offer-price">399 €<span> HT</span></div>
+      <div class="offer-delay">Délai : 5 à 8 jours</div>
+      <ul class="offer-features">
+        <li>Site 3 à 5 pages</li>
+        <li>Design personnalisé</li>
+        <li>Optimisation mobile complète</li>
+        <li>SEO de base (Google)</li>
+        <li>Formulaire de contact + Google Maps</li>
+        <li>Mise en ligne incluse</li>
+        <li>Code propre et optimisé</li>
+      </ul>
+      <a href="#contact" class="offer-btn">Choisir ce pack</a>
+      <p class="offer-ideal">👉 Idéal pour entreprises, freelances, associations.</p>
+    </div>
+
+    <!-- PRO -->
+    <div class="offer-card fade-in" style="--accent-color:#ef4444;">
+      <div class="offer-badge" style="background:#ef4444;">Pro</div>
+      <div class="offer-name">🔴 Pack Pro</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:0.6rem;">Site complet avancé</div>
+      <div class="offer-price">699 €<span> HT</span></div>
+      <div class="offer-delay">Délai : 7 à 14 jours</div>
+      <ul class="offer-features">
+        <li>Site complet sur mesure</li>
+        <li>Design moderne avec animations</li>
+        <li>SEO optimisé</li>
+        <li>Optimisation des performances</li>
+        <li>Fonctionnalités avancées (API, outils…)</li>
+        <li>1 mois de maintenance inclus</li>
+        <li>Code 100&nbsp;% fait main</li>
+      </ul>
+      <a href="#contact" class="offer-btn">Choisir ce pack</a>
+      <p class="offer-ideal">👉 Idéal pour projets sérieux ou entreprises établies.</p>
+    </div>
+
+    <!-- GAME -->
+    <div class="offer-card fade-in" style="--accent-color:#8B5CF6;">
+      <div class="offer-badge" style="background:#8B5CF6;">Jeu HTML5</div>
+      <div class="offer-name">🎮 Pack Jeu HTML5</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:0.6rem;">Jeu sur mesure</div>
+      <div class="offer-price">dès 100 €<span> HT</span></div>
+      <div class="offer-delay">Délai : 2 à 10 jours selon complexité</div>
+      <ul class="offer-features">
+        <li>Gameplay personnalisé</li>
+        <li>Interface utilisateur soignée</li>
+        <li>Score / menu / système de base</li>
+        <li>Export web (jouable sur navigateur)</li>
+        <li>Code JavaScript optimisé</li>
+      </ul>
+      <a href="#contact" class="offer-btn">Demander un devis</a>
+      <p class="offer-ideal">👉 Idéal pour sites web, marketing ou projets ludiques.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- OPTIONS -->
+<section id="options">
+  <div class="options-wrap">
+    <p class="section-eyebrow">Options supplémentaires</p>
+    <h2 class="section-title">Personnalisez votre projet</h2>
+    <p class="section-lead">Ajoutez des fonctionnalités à la carte à n'importe quel pack.</p>
+    <div class="options-list fade-in">
+      <div class="option-row">
+        <div>
+          <div class="option-name">📄 Page supplémentaire</div>
+          <div style="font-size:0.78rem;color:var(--muted);">Une page additionnelle à votre site</div>
+        </div>
+        <div class="option-price">+50 €</div>
+        <div class="option-delay">+1 à 2 jours</div>
+      </div>
+      <div class="option-row">
+        <div>
+          <div class="option-name">🔍 SEO avancé</div>
+          <div style="font-size:0.78rem;color:var(--muted);">Optimisation approfondie pour Google</div>
+        </div>
+        <div class="option-price">+100 €</div>
+        <div class="option-delay">+1 à 3 jours</div>
+      </div>
+      <div class="option-row">
+        <div>
+          <div class="option-name">🔧 Maintenance mensuelle</div>
+          <div style="font-size:0.78rem;color:var(--muted);">Mises à jour, corrections, support</div>
+        </div>
+        <div class="option-price">30 € / mois</div>
+        <div class="option-delay">En continu</div>
+      </div>
+      <div class="option-row">
+        <div>
+          <div class="option-name">⚡ Fonctionnalité spéciale</div>
+          <div style="font-size:0.78rem;color:var(--muted);">API, outil sur mesure, animation complexe…</div>
+        </div>
+        <div class="option-price">Sur devis</div>
+        <div class="option-delay">Variable</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div style="text-align:center; max-width:600px; margin:0 auto 3.5rem;">
+    <p class="section-eyebrow">Comment ça marche</p>
+    <h2 class="section-title">4 étapes, zéro stress</h2>
+  </div>
+  <div class="process-grid">
+    <div class="process-step fade-in">
+      <div class="process-icon">📋</div>
+      <div class="process-num">ÉTAPE 01</div>
+      <div class="process-title">Brief</div>
+      <p class="process-desc">Vous m'expliquez votre projet, vos besoins et vos objectifs.</p>
+    </div>
+    <div class="process-step fade-in">
+      <div class="process-icon">💡</div>
+      <div class="process-num">ÉTAPE 02</div>
+      <div class="process-title">Devis</div>
+      <p class="process-desc">Je vous envoie un devis gratuit et détaillé sous 24 h.</p>
+    </div>
+    <div class="process-step fade-in">
+      <div class="process-icon">⚙️</div>
+      <div class="process-num">ÉTAPE 03</div>
+      <div class="process-title">Développement</div>
+      <p class="process-desc">Je code votre projet à la main, proprement et dans les délais.</p>
+    </div>
+    <div class="process-step fade-in">
+      <div class="process-icon">🚀</div>
+      <div class="process-num">ÉTAPE 04</div>
+      <div class="process-title">Livraison</div>
+      <p class="process-desc">Mise en ligne, remise des sources et support post-livraison.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-grid">
+    <div class="fade-in">
+      <p class="section-eyebrow">Contact</p>
+      <h2 class="section-title">Parlons de votre projet&nbsp;🚀</h2>
+      <p style="color:var(--muted); margin-bottom:2.5rem;">
+        Un projet en tête ? Remplissez le formulaire et je vous réponds dans les 24 h avec un devis gratuit et sans engagement.
+      </p>
+      <div class="contact-info-item">
+        <div class="contact-icon">⚡</div>
+        <div>
+          <div class="contact-info-title">Réponse garantie</div>
+          <div class="contact-info-val">Sous 24 h ouvrées</div>
+        </div>
+      </div>
+      <div class="contact-info-item">
+        <div class="contact-icon">✅</div>
+        <div>
+          <div class="contact-info-title">Devis</div>
+          <div class="contact-info-val">Gratuit et sans engagement</div>
+        </div>
+      </div>
+      <div class="contact-info-item">
+        <div class="contact-icon">🛡️</div>
+        <div>
+          <div class="contact-info-title">Code 100&nbsp;%</div>
+          <div class="contact-info-val">Fait main, propre, optimisé</div>
+        </div>
+      </div>
+    </div>
+    <div class="fade-in">
+      <div style="background:var(--bg3); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:2rem;">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-name">Prénom *</label>
+            <input type="text" id="f-name" class="form-control" placeholder="Jean" required />
+          </div>
+          <div class="form-group">
+            <label for="f-lastname">Nom *</label>
+            <input type="text" id="f-lastname" class="form-control" placeholder="Dupont" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="f-email">Email *</label>
+          <input type="email" id="f-email" class="form-control" placeholder="jean@exemple.fr" required />
+        </div>
+        <div class="form-group">
+          <label for="f-pack">Pack souhaité</label>
+          <select id="f-pack" class="form-control">
+            <option value="">-- Sélectionnez un pack --</option>
+            <option>🟢 Pack Starter – 199 €</option>
+            <option>🔵 Pack Business – 399 €</option>
+            <option>🔴 Pack Pro – 699 €</option>
+            <option>🎮 Pack Jeu HTML5 – à partir de 100 €</option>
+            <option>Autre / Je ne sais pas encore</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="f-msg">Décrivez votre projet *</label>
+          <textarea id="f-msg" class="form-control" placeholder="Dites-moi en quelques mots ce que vous souhaitez créer…" required></textarea>
+        </div>
+        <button class="form-submit" id="form-submit" type="button">📩 Envoyer ma demande</button>
+        <div id="form-msg"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Dev<span>Web</span>Studio Game</div>
+  <div class="footer-copy">© 2025 DevWeb Studio Game — Tous droits réservés</div>
+  <div style="font-size:0.78rem;color:var(--muted);">Code fait main avec ❤️</div>
+</footer>
+
+<script>
+/* ── CANVAS RAIN ── */
+(function() {
+  const canvas = document.getElementById('canvas-bg');
+  const ctx = canvas.getContext('2d');
+  let W, H, cols, drops;
+
+  const chars = 'DEVWEBSTUDIOGAME01010110<>{}[]();=>+#@$%&*!?/\\HTMLCSSJScanvas'.split('');
+
+  function init() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    cols = Math.floor(W / 18);
+    drops = Array.from({ length: cols }, () => Math.random() * -H / 18);
+  }
+
+  function draw() {
+    ctx.fillStyle = 'rgba(10,11,20,0.045)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.font = '13px Courier New';
+
+    for (let i = 0; i < cols; i++) {
+      const ch = chars[Math.floor(Math.random() * chars.length)];
+      const x = i * 18;
+      const y = drops[i] * 18;
+
+      const ratio = y / H;
+      if (ratio < 0.3) ctx.fillStyle = '#8B5CF6';
+      else             ctx.fillStyle = '#00E5FF';
+
+      ctx.fillText(ch, x, y);
+      if (y > H && Math.random() > 0.975) drops[i] = 0;
+      drops[i] += 0.4;
+    }
+  }
+
+  init();
+  setInterval(draw, 55);
+  window.addEventListener('resize', init);
+})();
+
+/* ── NAV HAMBURGER ── */
+const ham = document.getElementById('hamburger');
+const navLinks = document.getElementById('nav-links');
+ham.addEventListener('click', () => {
+  ham.classList.toggle('open');
+  navLinks.classList.toggle('open');
+});
+navLinks.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    ham.classList.remove('open');
+    navLinks.classList.remove('open');
+  });
+});
+ham.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') ham.click(); });
+
+/* ── SCROLL FADE-IN ── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+/* ── EMAILJS INIT ── */
+// ⚠️ Remplacez les 3 valeurs ci-dessous par vos identifiants EmailJS
+const EMAILJS_PUBLIC_KEY  = 'D7YNCSnm-vcNgh095';
+const EMAILJS_SERVICE_ID  = 'service_8nkszw9';
+const EMAILJS_TEMPLATE_ID = 'template_uicuouk';
+
+emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+/* ── CONTACT FORM ── */
+document.getElementById('form-submit').addEventListener('click', function() {
+  const name  = document.getElementById('f-name').value.trim();
+  const lname = document.getElementById('f-lastname').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const pack  = document.getElementById('f-pack').value.trim();
+  const msg   = document.getElementById('f-msg').value.trim();
+  const fmsg  = document.getElementById('form-msg');
+
+  if (!name || !lname || !email || !msg) {
+    fmsg.className = 'error'; fmsg.style.display = 'block';
+    fmsg.textContent = '⚠️ Merci de remplir tous les champs obligatoires.';
+    return;
+  }
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!re.test(email)) {
+    fmsg.className = 'error'; fmsg.style.display = 'block';
+    fmsg.textContent = '⚠️ Adresse email invalide.';
+    return;
+  }
+
+  const btn = this;
+  btn.textContent = 'Envoi en cours…';
+  btn.disabled = true;
+  fmsg.style.display = 'none';
+
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    from_name:  name + ' ' + lname,
+    from_email: email,
+    pack:       pack || 'Non précisé',
+    message:    msg,
+    to_email:   'devweb.studiogame@gmail.com'
+  })
+  .then(() => {
+    fmsg.className = 'success'; fmsg.style.display = 'block';
+    fmsg.textContent = '✅ Message envoyé ! Je vous réponds dans les 24 h.';
+    btn.textContent = '📩 Envoyer ma demande';
+    btn.disabled = false;
+    ['f-name','f-lastname','f-email','f-pack','f-msg'].forEach(id => document.getElementById(id).value = '');
+  })
+  .catch((err) => {
+    fmsg.className = 'error'; fmsg.style.display = 'block';
+    fmsg.textContent = '❌ Erreur lors de l\'envoi. Veuillez réessayer ou me contacter directement.';
+    console.error('EmailJS error:', err);
+    btn.textContent = '📩 Envoyer ma demande';
+    btn.disabled = false;
+  });
+});
+</script>
+</body>
+</html>
