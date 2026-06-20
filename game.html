@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mes Jeux – DevWeb Studio Game</title>
+  <meta name="description" content="Téléchargez gratuitement les jeux HTML5 créés par DevWeb Studio Game. Jouez directement dans votre navigateur." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #0A0B14;
+      --bg2:      #111827;
+      --bg3:      #1a2035;
+      --cyan:     #00E5FF;
+      --violet:   #8B5CF6;
+      --white:    #F0F4FF;
+      --muted:    #7B8DAE;
+      --green:    #22c55e;
+      --radius:   12px;
+      --font-display: 'Orbitron', sans-serif;
+      --font-body:    'Inter', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--cyan); color: var(--bg); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 3px; }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw;
+      height: 64px;
+      background: rgba(10,11,20,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,229,255,0.08);
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--cyan);
+    }
+    .nav-logo span { color: var(--violet); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-cta {
+      padding: 0.45rem 1.1rem;
+      background: transparent;
+      border: 1px solid var(--cyan);
+      border-radius: 6px;
+      color: var(--cyan) !important;
+      font-size: 0.82rem !important;
+      font-weight: 600 !important;
+      transition: background 0.2s, color 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--cyan); color: var(--bg) !important; }
+    .nav-active { color: var(--violet) !important; }
+
+    /* hamburger */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--cyan); transition: all 0.3s; border-radius: 2px; }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+    /* ── HERO ── */
+    .page-hero {
+      padding: 130px 5vw 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      padding: 0.35rem 1rem;
+      border: 1px solid rgba(139,92,246,0.35);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--violet);
+      margin-bottom: 1.6rem;
+      background: rgba(139,92,246,0.07);
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 1.2rem;
+    }
+    .page-title .accent { color: var(--violet); }
+    .page-sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── GRID ── */
+    .games-section {
+      padding: 60px 5vw 100px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    /* ── CARD ── */
+    .game-card {
+      background: var(--bg2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px;
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      display: flex;
+      flex-direction: column;
+    }
+    .game-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(139,92,246,0.5);
+      box-shadow: 0 12px 40px rgba(139,92,246,0.15);
+    }
+    .card-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+      background: var(--bg3);
+    }
+    /* Placeholder quand pas d'image */
+    .card-thumb-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--bg3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .card-body {
+      padding: 1.6rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.6rem;
+      color: var(--white);
+    }
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      flex: 1;
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .card-badge {
+      padding: 0.2rem 0.65rem;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .badge-html5 { background: rgba(0,229,255,0.12); color: var(--cyan); border: 1px solid rgba(0,229,255,0.25); }
+    .badge-free  { background: rgba(34,197,94,0.12);  color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+    .card-size { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
+
+    .btn-download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.75rem 1.4rem;
+      background: var(--violet);
+      color: #fff;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .btn-download:hover {
+      background: transparent;
+      border-color: var(--violet);
+      color: var(--violet);
+      transform: translateY(-2px);
+    }
+    .btn-download svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* ── EMPTY STATE ── */
+    .empty-card {
+      background: var(--bg2);
+      border: 2px dashed rgba(139,92,246,0.25);
+      border-radius: 18px;
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .empty-card .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5; }
+    .empty-card p { font-size: 0.82rem; margin-top: 0.4rem; }
+
+    /* ── CTA BAND ── */
+    .cta-band {
+      background: var(--bg2);
+      border-top: 1px solid rgba(0,229,255,0.07);
+      border-bottom: 1px solid rgba(0,229,255,0.07);
+      padding: 70px 5vw;
+      text-align: center;
+    }
+    .cta-band h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+    }
+    .cta-band h2 span { color: var(--cyan); }
+    .cta-band p { color: var(--muted); margin-bottom: 2rem; font-size: 1rem; }
+    .btn-cta {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      background: var(--cyan);
+      color: var(--bg);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border: 2px solid var(--cyan);
+      transition: all 0.2s;
+    }
+    .btn-cta:hover { background: transparent; color: var(--cyan); transform: translateY(-2px); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2.5rem 5vw;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .footer-logo { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: var(--cyan); margin-bottom: 0.5rem; }
+    .footer-logo span { color: var(--violet); }
+    .footer-copy { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── FADE-IN ── */
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.55s ease, transform 0.55s ease; }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 680px) {
+      .nav-links { display: none; flex-direction: column; position: absolute; top: 64px; left: 0; right: 0; background: rgba(10,11,20,0.97); padding: 1.5rem 5vw; gap: 1.2rem; border-bottom: 1px solid rgba(0,229,255,0.08); }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+      .games-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Dev<span>Web</span>Studio Game</a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="index.html#about">À propos</a></li>
+    <li><a href="index.html#offres">Offres</a></li>
+    <li><a href="index.html#contact" class="nav-cta">Devis gratuit</a></li>
+    <li><a href="game.html" style="color:var(--violet);font-weight:700;">🎮 Mes Jeux</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" aria-label="Menu" role="button" tabindex="0">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <div class="hero-eyebrow">🎮 Créations HTML5</div>
+  <h1 class="page-title">Mes <span class="accent">Jeux</span></h1>
+  <p class="page-sub">Des jeux entièrement codés à la main, jouables dans le navigateur. Téléchargez et lancez le fichier — aucune installation requise.</p>
+</div>
+
+<!-- GAMES -->
+<div class="games-section">
+  <div class="games-grid">
+
+    <!-- ── JEUX : à personnaliser ── -->
+
+    <!-- Jeu 1 -->
+    <div class="game-card fade-in">
+      <!-- Remplacez "src" par le chemin vers votre capture d'écran -->
+      <!-- <img class="card-thumb" src="img/jeu1.png" alt="Capture du Jeu 1" /> -->
+      <div class="card-thumb-placeholder">🕹️</div>
+      <div class="card-body">
+        <div class="card-title">Lumena</div>
+        
+        <p>Devenir le leader incontesté du streaming mondial.</p>
+        <p>Pour cela, il faudra jongler entre la qualité du catalogue, l'innovation des productions originales, une gestion financière saine et une stratégie d'expansion agressive, tout en déjouant les plans des concurrents.</p>
+        <p>LUMENA est une plongée stratégique dans l'univers impitoyable du divertissement numérique, où chaque décision peut mener à la gloire ou à la faillite.</p>
+
+        <div class="card-meta">
+          <span class="card-badge badge-html5">HTML5</span>
+          <span class="card-badge badge-free">Gratuit</span>
+        </div>
+        <!-- Remplacez "href" par le chemin vers votre fichier (.zip ou .html) -->
+        <a class="btn-download" href="menu (4).html">
+          Jouer
+        </a>
+      </div>
+    </div>
+
+    <!-- Jeu 2 -->
+    <div class="game-card fade-in">
+      <div class="card-thumb-placeholder">🚀</div>
+      <div class="card-body">
+        <div class="card-title">Nom du Jeu 2</div>
+        <p class="card-desc">Décrivez votre jeu ici : le gameplay, l'objectif, le thème… Une ou deux phrases suffisent pour donner envie.</p>
+        <div class="card-meta">
+          <span class="card-badge badge-html5">HTML5</span>
+          <span class="card-badge badge-free">Gratuit</span>
+          <span class="card-size">~80 Ko</span>
+        </div>
+        <a class="btn-download" href="jeux/jeu2.zip" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Télécharger
+        </a>
+      </div>
+    </div>
+
+    <!-- Jeu 3 -->
+    <div class="game-card fade-in">
+      <div class="card-thumb-placeholder">🌌</div>
+      <div class="card-body">
+        <div class="card-title">Nom du Jeu 3</div>
+        <p class="card-desc">Décrivez votre jeu ici : le gameplay, l'objectif, le thème… Une ou deux phrases suffisent pour donner envie.</p>
+        <div class="card-meta">
+          <span class="card-badge badge-html5">HTML5</span>
+          <span class="card-badge badge-free">Gratuit</span>
+          <span class="card-size">~120 Ko</span>
+        </div>
+        <a class="btn-download" href="jeux/jeu3.zip" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Télécharger
+        </a>
+      </div>
+    </div>
+
+    <!-- Carte "bientôt disponible" -->
+    <div class="empty-card fade-in">
+      <div class="empty-icon">⏳</div>
+      <strong>Nouveau jeu en cours…</strong>
+      <p>Je code quelque chose de nouveau. Revenez bientôt !</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-band">
+  <h2>Vous voulez un jeu <span>sur mesure</span> ?</h2>
+  <p>Je crée des jeux HTML5 personnalisés à partir de 100 €. Gameplay, design, export web — tout inclus.</p>
+  <a href="index.html#contact" class="btn-cta">Demander un devis gratuit</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Dev<span>Web</span>Studio Game</div>
+  <div class="footer-copy">© 2025 DevWeb Studio Game — Tous droits réservés · Code fait main avec ❤️</div>
+</footer>
+
+<script>
+/* ── HAMBURGER ── */
+const ham = document.getElementById('hamburger');
+const navLinks = document.getElementById('nav-links');
+ham.addEventListener('click', () => {
+  ham.classList.toggle('open');
+  navLinks.classList.toggle('open');
+});
+ham.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') ham.click(); });
+
+/* ── FADE IN ── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
