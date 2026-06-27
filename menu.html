@@ -8,476 +8,101 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Menu - Flappy Emoji ✦ Saison 1</title>
+  <title>Flappy Emoji 🐣</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
     body {
+      margin: 0;
+      background: skyblue;
       font-family: "Segoe UI Emoji", Arial, sans-serif;
-      /* Couleur Saison 1 : Sombre et Mystérieux */
-      background: radial-gradient(circle at center, #2c1a4d 0%, #0f0c29 100%);
-      color: white;
-      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
+      height: 100vh;
+      overflow: hidden;
     }
-    
-    #menu {
-      /* Menu sombre avec effet de transparence */
-      background: rgba(20, 20, 40, 0.85);
-      backdrop-filter: blur(15px);
-      border-radius: 25px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-      max-width: 800px;
-      width: 100%;
-      padding: 40px;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    /* Badge Saison 1 */
-    .season-badge {
-      display: inline-block;
-      background: linear-gradient(45deg, #9C27B0, #7B1FA2);
-      padding: 5px 20px;
-      border-radius: 50px;
-      font-weight: bold;
-      font-size: 0.9em;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 15px;
-      box-shadow: 0 0 15px rgba(156, 39, 176, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    
-    h1 {
-      font-size: 3em;
-      margin-bottom: 10px;
-      /* Titre en Or pour la Saison 1 */
-      background: linear-gradient(to bottom, #ffffff 20%, #FFD700 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    }
-    
-    .subtitle {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 1.1em;
-      margin-bottom: 30px;
-    }
-
-    /* Compte à rebours hebdomadaire */
-    .weekly-countdown {
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 15px;
-      padding: 15px;
-      margin-bottom: 25px;
-      border: 1px solid rgba(255, 215, 0, 0.2);
-    }
-    .weekly-countdown h4 {
-      color: #FFD700;
-      font-size: 0.9em;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .timer-display {
-      font-family: monospace;
-      font-size: 1.5em;
-      font-weight: bold;
-      color: white;
-    }
-    
-    .section {
-      margin: 25px 0;
-      padding: 25px;
-      /* Sections sombres */
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .section h3 {
-      margin-bottom: 20px;
-      color: #FFD700; /* Or pour les titres de section */
-      font-size: 1.4em;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    
-    #emojis {
+    .game-layout {
+      position: relative;
       display: flex;
       justify-content: center;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin: 20px 0;
+      align-items: flex-start;
+      width: 400px;
     }
-    
-    .emoji-btn {
-      font-size: 50px;
-      padding: 15px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border-radius: 15px;
-      background: rgba(255, 255, 255, 0.1);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      border: 3px solid transparent;
-    }
-    
-    .emoji-btn:hover {
-      transform: translateY(-5px) scale(1.1);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-      background: rgba(255, 255, 255, 0.2);
-    }
-    
-    .emoji-btn.locked {
-      opacity: 0.2;
-      filter: grayscale(100%);
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    
-    .emoji-btn.selected {
-      border-color: #FFD700;
-      background: rgba(255, 215, 0, 0.1);
-      transform: scale(1.05);
-    }
-    
-    .pipe-skin-btn, .background-skin-btn, .ground-skin-btn {
-      display: inline-block;
-      margin: 8px;
-      cursor: pointer;
-      border-radius: 12px;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      border: 2px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .pipe-skin-btn { width: 70px; height: 45px; }
-    .background-skin-btn { width: 90px; height: 60px; }
-    .ground-skin-btn { width: 80px; height: 50px; }
-    
-    .pipe-skin-btn:hover, .background-skin-btn:hover, .ground-skin-btn:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-      border-color: rgba(255, 255, 255, 0.3);
-    }
-    
-    .pipe-skin-btn.locked, .background-skin-btn.locked, .ground-skin-btn.locked {
-      opacity: 0.2;
-      filter: grayscale(100%);
-      cursor: not-allowed;
-      transform: none !important;
-    }
-    
-    .pipe-skin-btn.selected, .background-skin-btn.selected, .ground-skin-btn.selected {
-      border: 3px solid #FFD700;
-      transform: scale(1.05);
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-    }
-    
-    .selection-info {
-      background: rgba(0, 0, 0, 0.3);
-      padding: 15px;
-      border-radius: 15px;
-      margin-top: 15px;
-      font-size: 1.1em;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(255, 215, 0, 0.3);
-    }
-
-    .selection-info span {
-      color: #FFD700;
-    }
-    
-    #startBtn {
-      background: linear-gradient(45deg, #FFD700, #FFA500);
-      color: #000;
-      border: none;
-      padding: 18px 40px;
-      font-size: 1.3em;
-      font-weight: bold;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin: 30px 0;
-    }
-    
-    #startBtn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(255, 215, 0, 0.5);
-      filter: brightness(1.1);
-    }
-    
-    .shop-btn {
-      background: linear-gradient(45deg, #FFD700, #FFA500);
-      color: #333;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1em;
-      font-weight: 600;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 8px rgba(255, 215, 0, 0.2);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .bonus-btn {
-      background: linear-gradient(45deg, #FF9800, #FF5722);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1em;
-      font-weight: 600;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 8px rgba(255, 152, 0, 0.2);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .quest-btn {
-      background: #607D8B;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1em;
-      font-weight: 600;
-      border-radius: 20px;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-    
-    .pass-btn {
-      background: linear-gradient(45deg, #9C27B0, #7B1FA2);
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1em;
-      font-weight: 600;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 8px rgba(156, 39, 176, 0.2);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .popup-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      display: flex; justify-content: center; align-items: center;
-      z-index: 10000; opacity: 0; visibility: hidden; transition: all 0.3s ease;
-    }
-    
-    .popup-overlay.show { opacity: 1; visibility: visible; }
-    
-    .popup {
-      background: #1a1a2e;
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 400px; width: 90%;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-      border: 1px solid var(--primary);
-      color: white;
-    }
-    
-    .score-info {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 20px;
-      border-radius: 15px;
-      margin-top: 20px;
-      border: 1px solid #FFD700;
-    }
-    
-    .score-info h4 { color: #FFD700; margin-bottom: 10px; font-size: 1.2em; }
-    
-    .score-display {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #FFD700;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-    }
-    
-    .skin-label {
+    .leaderboard {
       position: absolute;
-      bottom: 2px; left: 2px; right: 2px;
-      font-size: 10px; color: white;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-      text-align: center; font-weight: bold; z-index: 2;
+      right: calc(100% + 20px);
+      top: 0;
+      width: 220px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 10px;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+    .leaderboard h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      text-align: center;
+    }
+    .leaderboard table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .leaderboard th,
+    .leaderboard td {
+      padding: 6px 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: left;
+    }
+    .leaderboard th:last-child,
+    .leaderboard td:last-child {
+      text-align: right;
+    }
+    .leaderboard tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .leaderboard-empty {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.75);
+      padding: 10px 0 4px;
+      font-size: 13px;
+    }
+    canvas {
+      background: linear-gradient(to bottom, #4ec0ca, #ffffff);
+      border: 2px solid #000;
+      border-radius: 10px;
     }
     
-    .dev-toggle {
-      position: fixed; top: 10px; left: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.2);
-      border: none; padding: 4px 6px; border-radius: 3px;
-      cursor: pointer; font-size: 10px; z-index: 999;
-      opacity: 0.3;
-    }
-
-    @media (max-width: 768px) {
-      #menu { padding: 20px; margin: 10px; }
-      h1 { font-size: 2.5em; }
-    }
   </style>
 </head>
 <body>
-  <!-- Overlay de Connexion Sécurisé -->
-  <div id="usernameOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 12, 41, 0.98); z-index: 10000; display: flex; justify-content: center; align-items: center;">
-    <div style="background: rgba(20, 20, 40, 0.95); padding: 40px; border-radius: 25px; border: 1px solid #FFD700; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 0 30px rgba(255, 215, 0, 0.2); color: white; font-family: sans-serif;">
-      <div style="display: inline-block; background: linear-gradient(45deg, #9C27B0, #7B1FA2); padding: 5px 20px; border-radius: 50px; font-weight: bold; font-size: 0.9em; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px;">✦ Saison 1 ✦</div>
-      <h2 style="color: #FFD700; margin-bottom: 10px;">🐤 Connexion</h2>
-      <p style="color: #ccc; font-size: 14px; margin-bottom: 25px;">Synchronise tes scores et tes skins sur tous tes écrans 📱💻</p>
-      <div style="margin-bottom: 15px; text-align: left;">
-        <label style="display: block; color: #888; font-size: 11px; margin-bottom: 5px; text-transform: uppercase;">Pseudo</label>
-        <input type="text" id="usernameInput" placeholder="Ex: FlappyMaster" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #0a0a1a; color: white; font-size: 16px;">
-      </div>
-      <div style="margin-bottom: 15px; text-align: left;">
-        <label style="display: block; color: #888; font-size: 11px; margin-bottom: 5px; text-transform: uppercase;">Code PIN (4 chiffres) 🔒</label>
-        <input type="password" id="pinInput" placeholder="••••" maxlength="4" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #0a0a1a; color: white; font-size: 16px;">
-      </div>
-      <button id="saveUsernameBtn" style="width: 100%; padding: 15px; border-radius: 10px; border: none; background: linear-gradient(45deg, #FFD700, #FFA500); color: #000; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px;">REJOINDRE LE JEU</button>
-      <div style="margin-top: 20px; font-size: 11px; color: #555;">🛡️ Sauvegarde Cloud sécurisée via Firebase</div>
-    </div>
-  </div>
-    
-  <div id="menu" style="display:none;">
-    <div class="season-badge">✦ Saison 1 ✦</div>
-    <h1>🐤 Flappy Emoji</h1>
-    <p class="subtitle">Personnalise ton expérience pour la Saison 1 !</p>
-
-    <!-- Compte à rebours hebdomadaire -->
-    <div class="weekly-countdown">
-      <h4 id="nextPassTitle">Prochain Pass : Semaine 1</h4>
-      <div class="timer-display" id="weeklyTimer">00j 00h 00m 00s</div>
-    </div>
-    
-    <div class="section">
-      <h3>🎭 Emojis</h3>
-      <div id="emojis"></div>
-      <div class="selection-info">
-        Emoji sélectionné : <span id="currentEmoji">😁</span>
-      </div>
-    </div>
-    
-    <div class="section">
-      <h3>🔧 Tuyaux</h3>
-      <div id="pipeSkins"></div>
-      <div class="selection-info">
-        Tuyaux sélectionnés : <span id="currentPipeSkin">Classique</span>
-      </div>
-    </div>
-    
-    <div class="section">
-      <h3>🌅 Arrière-plans</h3>
-      <div id="backgroundSkins"></div>
-      <div class="selection-info">
-        Arrière-plan sélectionné : <span id="currentBackgroundSkin">Ciel</span>
-      </div>
-    </div>
-    
-    <div class="section">
-      <h3>🌱 Sols</h3>
-      <div id="groundSkins"></div>
-      <div class="selection-info">
-        Sol sélectionné : <span id="currentGroundSkin">Herbe</span>
-      </div>
-    </div>
-    
-    <div style="display: flex; gap: 15px; justify-content: center; margin: 20px 0; flex-wrap: wrap;">
-      <button id="startBtn">🎮 Jouer</button>
-      <button id="shopBtn" class="shop-btn">🛒 Boutique</button>
-      <button id="bonusBtn" class="bonus-btn">🎁 Bonus</button>
-      <button id="questBtn" class="quest-btn">📋 Quêtes 🚧</button>
-      <button id="passBtn" class="pass-btn">🎯 Pass Emoji</button>
-    </div>
-    
-    <div class="score-info">
-      <h4>🏆 Ton Score Maximum</h4>
-      <div class="score-display" id="bestScoreDisplay">0</div>
-    </div>
-    
-    <div class="score-info" id="leagueInfo">
-      <h4>🏅 Ta Ligue</h4>
-      <div class="score-display" id="leagueDisplay">Pas encore en ligue</div>
-      <div id="leagueProgress" style="margin-top:12px; height:10px; background: rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden;">
-        <div id="leagueProgressFill" style="height:100%; width:0%; background: linear-gradient(90deg, #9C27B0, #FFD700);"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bouton développeur caché -->
-  <button class="dev-toggle" id="devToggle">•</button>
-  
-  <div id="devMenu" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#1a1a2e; padding:30px; border-radius:15px; border:2px solid #FFD700; z-index:1000; text-align:center; color:white;">
-    <h3>🔧 Menu Développeur</h3>
-    <input type="password" id="devPassword" placeholder="Mot de passe" style="padding:10px; margin:10px; background:#0f0c29; border:1px solid #333; color:white;">
-    <br>
-    <button id="devLogin" style="padding:10px 20px; background:#FFD700; border:none; border-radius:5px; cursor:pointer;">Connexion</button>
-    <button id="devClose" style="padding:10px 20px; background:#333; border:none; border-radius:5px; color:white; margin-left:10px;">Fermer</button>
-    <div id="devOptions" style="display:none; margin-top:20px;">
-        <button id="resetGame" style="padding:10px; background:#f44336; border:none; border-radius:5px; color:white;">Réinitialiser Jeu</button>
-    </div>
+  <div class="game-layout">
+    <aside class="leaderboard" aria-label="Classement des scores">
+      <h2>🏆 Top 10</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Rang</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+      <div id="leaderboard-empty" class="leaderboard-empty">Aucun score enregistré</div>
+    </aside>
+    <!-- 🎮 Canvas du jeu -->
+    <canvas id="game" width="400" height="600"></canvas>
   </div>
 
   <script>
-    // --- LOGIQUE DU COMPTE À REBOURS HEBDOMADAIRE ---
-    function updateWeeklyCountdown() {
-      const now = new Date();
-      
-      // Dates de déblocage (Samedis à 16h00)
-      const releaseDates = [
-        { week: 1, date: new Date("2026-06-27T16:00:00") },
-        { week: 2, date: new Date("2026-07-04T16:00:00") },
-        { week: 3, date: new Date("2026-07-11T16:00:00") },
-        { week: 4, date: new Date("2026-07-18T16:00:00") },
-        { week: "Fin", date: new Date("2026-07-25T16:00:00") }
-      ];
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const leaderboardBody = document.getElementById("leaderboard-body");
+    const leaderboardEmpty = document.getElementById("leaderboard-empty");
+    const leaderboardStorageKey = "topScores";
 
-      let target = releaseDates.find(rd => rd.date > now);
-      
-      if (!target) {
-        document.getElementById("nextPassTitle").textContent = "Saison Terminée";
-        document.getElementById("weeklyTimer").textContent = "--j --h --m --s";
-        return;
-      }
-
-      document.getElementById("nextPassTitle").textContent = target.week === "Fin" ? "Fin de la Saison 1" : "Prochain Pass : Semaine " + target.week;
-      
-      const diff = target.date - now;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      document.getElementById("weeklyTimer").textContent = 
-        `${days}j ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
-    }
-
-    setInterval(updateWeeklyCountdown, 1000);
-    updateWeeklyCountdown();
-
-    // --- LOGIQUE ORIGINALE DU JEU ---
+    // 🔹 Liste des emojis à débloquer
     let emojiList = [
       { emoji: "😁", minScore: 0, isShop: false },
       { emoji: "😅", minScore: 50, isShop: false },
@@ -519,13 +144,32 @@
       { emoji: "😡", minScore: 1850, isShop: false },
       { emoji: "😠", minScore: 1900, isShop: false },
       { emoji: "💩", minScore: 1950, isShop: false },
+      // Emojis de la boutique
       { emoji: "👑", minScore: 0, isShop: true, shopId: "emoji_0" },
       { emoji: "💎", minScore: 0, isShop: true, shopId: "emoji_1" },
       { emoji: "🔥", minScore: 0, isShop: true, shopId: "emoji_2" },
       { emoji: "⚡", minScore: 0, isShop: true, shopId: "emoji_3" },
       { emoji: "🌟", minScore: 0, isShop: true, shopId: "emoji_4" }
     ];
+    
+    // Charger les emojis du Pass Emoji depuis le localStorage
+    function loadPassEmojis() {
+      const savedEmojis = JSON.parse(localStorage.getItem("emojiList") || "[]");
+      const passEmojis = savedEmojis.filter(emoji => emoji.isPassEmoji);
+      
+      // Ajouter les emojis du Pass Emoji à la liste principale
+      passEmojis.forEach(passEmoji => {
+        const exists = emojiList.some(emoji => emoji.emoji === passEmoji.emoji);
+        if (!exists) {
+          emojiList.push(passEmoji);
+        }
+      });
+    }
+    
+    // Charger les emojis du Pass Emoji au démarrage
+    loadPassEmojis();
 
+    // 🔹 Liste des skins de tuyaux à débloquer
     const pipeSkinList = [
       { name: "Classique", color: "#4CAF50", minScore: 0, isShop: false },
       { name: "Métal", color: "#607D8B", minScore: 50, isShop: false },
@@ -533,6 +177,7 @@
       { name: "Cristal", color: "#00BCD4", minScore: 150, isShop: false },
       { name: "Lave", color: "#FF5722", minScore: 200, isShop: false },
       { name: "Arc-en-ciel", color: "linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3)", minScore: 250, isShop: false },
+      // Tuyaux de la boutique
       { name: "Cristal Prismatique", color: "linear-gradient(45deg, #ff0080, #00ff80, #8000ff, #ff8000)", minScore: 0, isShop: true, shopId: "pipe_0" },
       { name: "Or Pur 24K", color: "linear-gradient(45deg, #FFD700, #FFA500, #FF8C00)", minScore: 0, isShop: true, shopId: "pipe_1" },
       { name: "Diamant Noir", color: "linear-gradient(45deg, #000000, #1a1a1a, #333333)", minScore: 0, isShop: true, shopId: "pipe_2" },
@@ -541,6 +186,7 @@
       { name: "Énergie Cosmique", color: "linear-gradient(45deg, #ff6b6b, #4ec0ca, #45b7d1, #96ceb4)", minScore: 0, isShop: true, shopId: "pipe_5" }
     ];
 
+    // 🔹 Liste des arrière-plans à débloquer
     const backgroundSkinList = [
       { name: "Ciel", type: "gradient", colors: ["#4ec0ca", "#ffffff"], minScore: 0, isShop: false },
       { name: "Coucher", type: "gradient", colors: ["#ff7b7b", "#ff9a56", "#ffad56"], minScore: 50, isShop: false },
@@ -549,6 +195,7 @@
       { name: "Orage", type: "gradient", colors: ["#434343", "#000000", "#2c3e50"], minScore: 200, isShop: false },
       { name: "Espace", type: "gradient", colors: ["#0c0c0c", "#1a1a2e", "#16213e"], minScore: 250, isShop: false },
       { name: "Arc-en-ciel", type: "gradient", colors: ["#ff0000", "#ff7f00", "#ffff00", "#00ff00", "#0000ff", "#4b0082", "#9400d3"], minScore: 300, isShop: false },
+      // Arrière-plans de la boutique
       { name: "Nébuleuse d'Orion", type: "gradient", colors: ["#0c0c0c", "#1a1a2e", "#16213e", "#0f3460", "#e94560"], minScore: 0, isShop: true, shopId: "bg_0" },
       { name: "Trou Noir", type: "gradient", colors: ["#000000", "#1a1a1a", "#2d2d2d", "#000000"], minScore: 0, isShop: true, shopId: "bg_1" },
       { name: "Big Bang", type: "gradient", colors: ["#ff0000", "#ff8000", "#ffff00", "#00ff00", "#0080ff", "#8000ff"], minScore: 0, isShop: true, shopId: "bg_2" },
@@ -557,6 +204,7 @@
       { name: "Multivers Infini", type: "gradient", colors: ["#ff6b6b", "#4ec0ca", "#45b7d1", "#96ceb4", "#feca57", "#ff9ff3"], minScore: 0, isShop: true, shopId: "bg_5" }
     ];
 
+    // 🔹 Liste des skins de sols à débloquer
     const groundSkinList = [
       { name: "Herbe", color: "#8BC34A", minScore: 0, isShop: false },
       { name: "Sable", color: "#FFC107", minScore: 50, isShop: false },
@@ -565,6 +213,7 @@
       { name: "Glace", color: "#81D4FA", minScore: 200, isShop: false },
       { name: "Cristal", color: "#E1BEE7", minScore: 250, isShop: false },
       { name: "Métal", color: "#607D8B", minScore: 300, isShop: false },
+      // Sols de la boutique
       { name: "Or Pur", color: "linear-gradient(45deg, #FFD700, #FFA500)", minScore: 0, isShop: true, shopId: "ground_0" },
       { name: "Diamant", color: "linear-gradient(45deg, #E1F5FE, #B3E5FC, #81D4FA)", minScore: 0, isShop: true, shopId: "ground_1" },
       { name: "Néon", color: "linear-gradient(45deg, #00E676, #00BCD4, #3F51B5)", minScore: 0, isShop: true, shopId: "ground_2" },
@@ -573,224 +222,876 @@
       { name: "Holographique", color: "linear-gradient(45deg, #FF00FF, #00FFFF, #FFFF00)", minScore: 0, isShop: true, shopId: "ground_5" }
     ];
 
+    // 🔹 Charger les données depuis le navigateur
     let bestScore = parseInt(localStorage.getItem("bestScore") || "0");
+    let cumulativeScore = parseInt(localStorage.getItem("cumulativeScore") || "0");
     let selectedEmoji = localStorage.getItem("selectedEmoji") || "😁";
     let selectedPipeSkin = parseInt(localStorage.getItem("selectedPipeSkin") || "0");
     let selectedBackgroundSkin = parseInt(localStorage.getItem("selectedBackgroundSkin") || "0");
     let selectedGroundSkin = parseInt(localStorage.getItem("selectedGroundSkin") || "0");
+    
+    function getLeaderboardScores() {
+      const savedScores = JSON.parse(localStorage.getItem(leaderboardStorageKey) || "[]");
+      return savedScores
+        .map(value => parseInt(value, 10))
+        .filter(value => Number.isFinite(value) && value >= 0)
+        .sort((a, b) => b - a)
+        .slice(0, 10);
+    }
 
+    function saveLeaderboardScores(scores) {
+      localStorage.setItem(leaderboardStorageKey, JSON.stringify(scores));
+    }
+
+    function renderLeaderboard() {
+      db.ref('leaderboard').orderByChild('score').limitToLast(10).on('value', (snap) => {
+        leaderboardBody.innerHTML = "";
+        const scores = [];
+        snap.forEach(c => scores.push(c.val()));
+        if (scores.length === 0) {
+          leaderboardEmpty.style.display = "block";
+          return;
+        }
+        leaderboardEmpty.style.display = "none";
+        scores.reverse().forEach((s, i) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>#${i+1} ${s.username || ''}</td><td>${s.score}</td>`;
+          leaderboardBody.appendChild(row);
+        });
+      });
+    }
+
+    function registerScore(scoreValue) {
+      if (!Number.isFinite(scoreValue) || scoreValue < 0) return;
+
+      cumulativeScore += Math.floor(scoreValue);
+      localStorage.setItem("cumulativeScore", cumulativeScore);
+
+      // --- SYNC CLOUD ---
+      const currentUsername = sessionStorage.getItem("currentUsername");
+      if (currentUsername) {
+          let best = parseInt(localStorage.getItem("bestScore") || "0");
+          if (scoreValue > best) {
+              localStorage.setItem("bestScore", scoreValue);
+              cloudSave("bestScore", scoreValue);
+          }
+          db.ref('leaderboard').push({
+              username: currentUsername,
+              score: scoreValue,
+              timestamp: Date.now()
+          });
+      }
+
+      const updatedScores = getLeaderboardScores();
+      updatedScores.push(scoreValue);
+      updatedScores.sort((a, b) => b - a);
+      const topScores = updatedScores.slice(0, 10);
+      saveLeaderboardScores(topScores);
+
+      if (topScores.length > 0) {
+        bestScore = topScores[0];
+        localStorage.setItem("bestScore", bestScore);
+      }
+
+      renderLeaderboard();
+    }
+
+    // Compatibilité : injecter l'ancien meilleur score s'il existe
+    if (bestScore > 0 && getLeaderboardScores().length === 0) {
+      saveLeaderboardScores([bestScore]);
+    }
+    renderLeaderboard();
+
+    // 🔹 Fonction pour vérifier si un skin de boutique est possédé
     function isShopItemOwned(shopId) {
       const ownedItems = JSON.parse(localStorage.getItem("ownedItems") || "[]");
       return ownedItems.includes(shopId);
     }
-
-    function isSkinUnlocked(skin) {
-      if (skin.isShop) return isShopItemOwned(skin.shopId);
-      return bestScore >= skin.minScore;
-    }
-
-    function updateCasier() {
-      const emojisDiv = document.getElementById("emojis");
-      emojisDiv.innerHTML = "";
-      emojiList.forEach(e => {
-        const btn = document.createElement("div");
-        btn.className = "emoji-btn";
-        btn.textContent = e.emoji;
-        if (!isSkinUnlocked(e)) btn.classList.add("locked");
-        if (e.emoji === selectedEmoji) btn.classList.add("selected");
-        if (isSkinUnlocked(e)) {
-          btn.onclick = () => {
-            selectedEmoji = e.emoji;
-            localStorage.setItem("selectedEmoji", selectedEmoji);
-            
-    // --- FIREBASE SYNC LOGIC ---
-    const usernameOverlay = document.getElementById("usernameOverlay");
-    const saveUsernameBtn = document.getElementById("saveUsernameBtn");
     
-    window.addEventListener('load', () => {
-      const user = sessionStorage.getItem("currentUsername");
-      const pin = sessionStorage.getItem("currentPin");
-      if (user && pin) login(user, pin);
-    });
-
-    saveUsernameBtn.onclick = async () => {
-      const user = document.getElementById("usernameInput").value.trim();
-      const pin = document.getElementById("pinInput").value.trim();
-      if (user.length < 2 || pin.length !== 4) return alert("Pseudo ou PIN invalide !");
-      
-      saveUsernameBtn.disabled = true;
-      const res = await syncUserData(user, pin);
-      if (res.success) {
-        sessionStorage.setItem("currentUsername", user);
-        sessionStorage.setItem("currentPin", pin);
-        login(user, pin);
+    // 🔹 Fonction pour vérifier si un skin est débloqué (score ou boutique)
+    function isSkinUnlocked(item) {
+      if (item.isShop) {
+        return isShopItemOwned(item.shopId);
+      } else if (item.isPassEmoji) {
+        // Les emojis du Pass Emoji se débloquent via le score cumulé
+        return cumulativeScore >= item.minScore;
       } else {
-        alert("Pseudo déjà pris ou PIN incorrect.");
-        saveUsernameBtn.disabled = false;
+        return bestScore >= item.minScore;
       }
-    };
-
-    function login(user, pin) {
-      usernameOverlay.style.display = "none";
-      document.getElementById("menu").style.display = "block";
-      updateCasier();
     }
-    // ---------------------------
     
-    updateCasier();
-            document.getElementById("currentEmoji").textContent = selectedEmoji;
-          };
-        }
-        emojisDiv.appendChild(btn);
-      });
-
-      renderSkins("pipeSkins", pipeSkinList, selectedPipeSkin, (idx) => {
-        selectedPipeSkin = idx;
-        localStorage.setItem("selectedPipeSkin", selectedPipeSkin);
-        document.getElementById("currentPipeSkin").textContent = pipeSkinList[idx].name;
-      });
-
-      renderSkins("backgroundSkins", backgroundSkinList, selectedBackgroundSkin, (idx) => {
-        selectedBackgroundSkin = idx;
-        localStorage.setItem("selectedBackgroundSkin", selectedBackgroundSkin);
-        document.getElementById("currentBackgroundSkin").textContent = backgroundSkinList[idx].name;
-      });
-
-      renderSkins("groundSkins", groundSkinList, selectedGroundSkin, (idx) => {
-        selectedGroundSkin = idx;
-        localStorage.setItem("selectedGroundSkin", selectedGroundSkin);
-        document.getElementById("currentGroundSkin").textContent = groundSkinList[idx].name;
-      });
-    }
-
-    function renderSkins(containerId, list, selectedIdx, onSelect) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = "";
-      list.forEach((item, index) => {
-        const btn = document.createElement("div");
-        btn.className = containerId.slice(0, -1) + "-btn";
-        if (!isSkinUnlocked(item)) btn.classList.add("locked");
-        if (index === selectedIdx) btn.classList.add("selected");
-        
-        if (item.colors) {
-          btn.style.background = `linear-gradient(to bottom, ${item.colors.join(", ")})`;
+    // 🔹 Fonction pour valider et corriger les sélections de skins
+    function validateSkinSelections() {
+      // Vérifier l'emoji sélectionné
+      const emojiIndex = emojiList.findIndex(e => e.emoji === selectedEmoji);
+      if (emojiIndex === -1 || !isSkinUnlocked(emojiList[emojiIndex])) {
+        // Trouver le premier emoji débloqué
+        const unlockedEmoji = emojiList.find(e => isSkinUnlocked(e));
+        if (unlockedEmoji) {
+          selectedEmoji = unlockedEmoji.emoji;
+          localStorage.setItem("selectedEmoji", selectedEmoji);
         } else {
-          btn.style.background = item.color;
+          // Si aucun emoji n'est débloqué, utiliser le premier
+          selectedEmoji = emojiList[0].emoji;
+          localStorage.setItem("selectedEmoji", selectedEmoji);
         }
-
-        const label = document.createElement("div");
-        label.className = "skin-label";
-        label.textContent = item.name;
-        btn.appendChild(label);
-
-        if (isSkinUnlocked(item)) {
-          btn.onclick = () => {
-            onSelect(index);
-            
-    // --- FIREBASE SYNC LOGIC ---
-    const usernameOverlay = document.getElementById("usernameOverlay");
-    const saveUsernameBtn = document.getElementById("saveUsernameBtn");
-    
-    window.addEventListener('load', () => {
-      const user = sessionStorage.getItem("currentUsername");
-      const pin = sessionStorage.getItem("currentPin");
-      if (user && pin) login(user, pin);
-    });
-
-    saveUsernameBtn.onclick = async () => {
-      const user = document.getElementById("usernameInput").value.trim();
-      const pin = document.getElementById("pinInput").value.trim();
-      if (user.length < 2 || pin.length !== 4) return alert("Pseudo ou PIN invalide !");
-      
-      saveUsernameBtn.disabled = true;
-      const res = await syncUserData(user, pin);
-      if (res.success) {
-        sessionStorage.setItem("currentUsername", user);
-        sessionStorage.setItem("currentPin", pin);
-        login(user, pin);
-      } else {
-        alert("Pseudo déjà pris ou PIN incorrect.");
-        saveUsernameBtn.disabled = false;
       }
-    };
-
-    function login(user, pin) {
-      usernameOverlay.style.display = "none";
-      document.getElementById("menu").style.display = "block";
-      updateCasier();
-    }
-    // ---------------------------
-    
-    updateCasier();
-          };
+      
+      // Vérifier le skin de tuyau sélectionné
+      if (selectedPipeSkin >= pipeSkinList.length || !isSkinUnlocked(pipeSkinList[selectedPipeSkin])) {
+        // Trouver le premier skin de tuyau débloqué
+        const unlockedPipeIndex = pipeSkinList.findIndex(skin => isSkinUnlocked(skin));
+        if (unlockedPipeIndex !== -1) {
+          selectedPipeSkin = unlockedPipeIndex;
+          localStorage.setItem("selectedPipeSkin", selectedPipeSkin);
+        } else {
+          // Si aucun skin n'est débloqué, utiliser le premier
+          selectedPipeSkin = 0;
+          localStorage.setItem("selectedPipeSkin", selectedPipeSkin);
         }
-        container.appendChild(btn);
+      }
+      
+      // Vérifier l'arrière-plan sélectionné
+      if (selectedBackgroundSkin >= backgroundSkinList.length || !isSkinUnlocked(backgroundSkinList[selectedBackgroundSkin])) {
+        // Trouver le premier arrière-plan débloqué
+        const unlockedBgIndex = backgroundSkinList.findIndex(bg => isSkinUnlocked(bg));
+        if (unlockedBgIndex !== -1) {
+          selectedBackgroundSkin = unlockedBgIndex;
+          localStorage.setItem("selectedBackgroundSkin", selectedBackgroundSkin);
+        } else {
+          // Si aucun arrière-plan n'est débloqué, utiliser le premier
+          selectedBackgroundSkin = 0;
+          localStorage.setItem("selectedBackgroundSkin", selectedBackgroundSkin);
+        }
+      }
+      
+      // Vérifier le sol sélectionné
+      if (selectedGroundSkin >= groundSkinList.length || !isSkinUnlocked(groundSkinList[selectedGroundSkin])) {
+        // Trouver le premier sol débloqué
+        const unlockedGroundIndex = groundSkinList.findIndex(ground => isSkinUnlocked(ground));
+        if (unlockedGroundIndex !== -1) {
+          selectedGroundSkin = unlockedGroundIndex;
+          localStorage.setItem("selectedGroundSkin", selectedGroundSkin);
+        } else {
+          // Si aucun sol n'est débloqué, utiliser le premier
+          selectedGroundSkin = 0;
+          localStorage.setItem("selectedGroundSkin", selectedGroundSkin);
+        }
+      }
+    }
+
+    // 🕹️ ---- JEU ----
+    let gameRunning = false;
+    let animationId = null;
+    let devMenuOpen = false; // Menu développeur ouvert
+    
+    function startGame() {
+      // Valider les sélections de skins avant de démarrer
+      validateSkinSelections();
+      
+      // Charger l'état de la hitbox
+      let showHitbox = localStorage.getItem("showHitbox") === "true";
+      
+      gameRunning = true;
+      let frames = 0;
+      const gravity = 0.25;
+      const jump = 4.6;
+      
+      // 🔹 Charger les bonus actifs et filtrer ceux expirés
+      let activeBonuses = JSON.parse(localStorage.getItem("activeBonuses") || "[]");
+      const ownedBonusesExpiry = JSON.parse(localStorage.getItem("ownedBonusesExpiry") || "{}");
+      const nowTs = Date.now();
+      activeBonuses = activeBonuses.filter(id => (ownedBonusesExpiry[id] || 0) > nowTs);
+      const startPointsBonuses = [
+        { id: "start_10", points: 10 },
+        { id: "start_20", points: 20 },
+        { id: "start_30", points: 30 },
+        { id: "start_50", points: 50 }
+      ];
+      
+      // Calculer les points de départ
+      let startBonus = 0;
+      activeBonuses.forEach(bonusId => {
+        const bonus = startPointsBonuses.find(b => b.id === bonusId);
+        if (bonus) {
+          startBonus = Math.max(startBonus, bonus.points);
+        }
       });
-    }
-
-    function updateLeagueUI() {
-      document.getElementById("bestScoreDisplay").textContent = bestScore;
-      const leagueLevel = Math.floor(bestScore / 100);
-      const progress = bestScore % 100;
-      document.getElementById("leagueDisplay").textContent = leagueLevel > 0 ? "Ligue " + leagueLevel : "Pas encore en ligue";
-      document.getElementById("leagueProgressFill").style.width = progress + "%";
-    }
-
-    document.getElementById("startBtn").onclick = () => window.location.href = "interface.html";
-    document.getElementById("shopBtn").onclick = () => window.location.href = "boutique.html";
-    document.getElementById("bonusBtn").onclick = () => window.location.href = "bonus.html";
-    document.getElementById("passBtn").onclick = () => window.location.href = "passemoji.html";
-    
-    // Dev Menu
-    const devToggle = document.getElementById("devToggle");
-    devToggle.onclick = () => document.getElementById("devMenu").style.display = "block";
-    document.getElementById("devClose").onclick = () => document.getElementById("devMenu").style.display = "none";
-    document.getElementById("devLogin").onclick = () => {
-        if(document.getElementById("devPassword").value === "2025") {
-            document.getElementById("devOptions").style.display = "block";
-        }
-    };
-    document.getElementById("resetGame").onclick = () => {
-        if(confirm("Réinitialiser ?")) { localStorage.clear(); location.reload(); }
-    };
-
-    
-    // --- FIREBASE SYNC LOGIC ---
-    const usernameOverlay = document.getElementById("usernameOverlay");
-    const saveUsernameBtn = document.getElementById("saveUsernameBtn");
-    
-    window.addEventListener('load', () => {
-      const user = sessionStorage.getItem("currentUsername");
-      const pin = sessionStorage.getItem("currentPin");
-      if (user && pin) login(user, pin);
-    });
-
-    saveUsernameBtn.onclick = async () => {
-      const user = document.getElementById("usernameInput").value.trim();
-      const pin = document.getElementById("pinInput").value.trim();
-      if (user.length < 2 || pin.length !== 4) return alert("Pseudo ou PIN invalide !");
       
-      saveUsernameBtn.disabled = true;
-      const res = await syncUserData(user, pin);
-      if (res.success) {
-        sessionStorage.setItem("currentUsername", user);
-        sessionStorage.setItem("currentPin", pin);
-        login(user, pin);
-      } else {
-        alert("Pseudo déjà pris ou PIN incorrect.");
-        saveUsernameBtn.disabled = false;
-      }
-    };
+      // Calculer les vies supplémentaires
+      const extraLivesBonuses = [
+        { id: "life_1", lives: 1 },
+        { id: "life_2", lives: 2 }
+      ];
+      let extraLives = 0;
+      activeBonuses.forEach(bonusId => {
+        const bonus = extraLivesBonuses.find(b => b.id === bonusId);
+        if (bonus) {
+          extraLives = Math.max(extraLives, bonus.lives);
+        }
+      });
+      
+      let score = startBonus; // Commencer avec les points de bonus
+      let lives = 1 + extraLives; // Vies initiales + bonus
+      let gameOver = false;
+      const pipes = [];
 
-    function login(user, pin) {
-      usernameOverlay.style.display = "none";
-      document.getElementById("menu").style.display = "block";
-      updateCasier();
+      const bird = {
+        x: 60,
+        y: 150,
+        size: 36,
+        velocity: 0,
+        jump() {
+          this.velocity = -jump;
+        },
+        update() {
+          this.velocity += gravity;
+          this.y += this.velocity;
+
+          if (this.y + this.size > canvas.height - 40) {
+            this.y = canvas.height - 40 - this.size;
+            if (lives > 1) {
+              lives--;
+              this.y = canvas.height / 2;
+              this.velocity = 0;
+            } else {
+              gameOver = true;
+            }
+          }
+          if (this.y < 0) {
+            this.y = 0;
+            if (lives > 1) {
+              lives--;
+              this.y = canvas.height / 2;
+              this.velocity = 0;
+            } else {
+              this.velocity = 0;
+            }
+          }
+        },
+        getHitBox() {
+          // Cercle de collision centré sur l'emoji
+          const centerX = this.x + this.size * 0.67; // Décalé vers la droite à 70%
+          const centerY = this.y - this.size * 0.35; // Ajustement pour centrer sur l'emoji
+          const radius = this.size * 0.35; // 35% de la taille de l'emoji (diamètre = 70%)
+          
+          return {
+            x: centerX,
+            y: centerY,
+            radius: radius
+          };
+        },
+        draw() {
+          // Dessin de l'emoji
+          ctx.font = `${this.size}px "Segoe UI Emoji"`;
+          ctx.fillText(selectedEmoji, this.x, this.y);
+
+          // 🔴 Dessiner la hitbox circulaire (si activée)
+          if (showHitbox) {
+            const hit = this.getHitBox();
+            ctx.strokeStyle = "rgba(255, 0, 0, 0.6)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(hit.x, hit.y, hit.radius, 0, 2 * Math.PI);
+            ctx.stroke();
+          }
+        }
+      };
+
+      function addPipe() {
+        const top = Math.random() * 200 + 50;
+        const gap = 120;
+        pipes.push({ x: canvas.width, top: top, bottom: top + gap, passed: false });
+      }
+
+      function getPipeSpeed() {
+        const baseSpeed = 2;
+        const speedThreshold = 30;
+        const speedIncreasePerPoint = 0.015;
+        const maxSpeed = 5;
+
+        if (score <= speedThreshold) {
+          return baseSpeed;
+        }
+
+        const extraPoints = score - speedThreshold;
+        return Math.min(maxSpeed, baseSpeed + extraPoints * speedIncreasePerPoint);
+      }
+
+      function updatePipes() {
+        const pipeSpeed = getPipeSpeed();
+
+        for (let i = 0; i < pipes.length; i++) {
+          const p = pipes[i];
+          p.x -= pipeSpeed;
+
+          // Collision circulaire avec les tuyaux
+          const hit = bird.getHitBox();
+          const pipeLeft = p.x + 5;
+          const pipeRight = p.x + 45;
+          const pipeTop = p.top - 5;
+          const pipeBottom = p.bottom + 5;
+          
+          // Vérifier si le cercle touche le tuyau
+          if (hit.x + hit.radius > pipeLeft && hit.x - hit.radius < pipeRight) {
+            // Le cercle est dans la zone horizontale du tuyau
+            if (hit.y - hit.radius < pipeTop || hit.y + hit.radius > pipeBottom) {
+              // Le cercle touche le tuyau par le haut ou le bas
+              if (lives > 1) {
+                // Utiliser une vie supplémentaire
+                lives--;
+                // Repositionner l'oiseau au centre
+                bird.y = canvas.height / 2;
+                bird.velocity = 0;
+                // Retirer ce tuyau pour éviter un game over immédiat
+                pipes.splice(i, 1);
+                // Continuer la boucle sans incrémenter i pour éviter de manquer le prochain tuyau
+                continue;
+              } else {
+                gameOver = true;
+              }
+            }
+          }
+
+          if (!p.passed && p.x + 50 < bird.x) {
+            p.passed = true;
+            score++;
+            // Gagner 1 diamant tous les 30 points
+            if (score % 30 === 0) {
+              let diamonds = parseInt(localStorage.getItem("diamonds") || "0");
+              diamonds++;
+              localStorage.setItem("diamonds", diamonds.toString());
+              
+              // Mettre à jour les quêtes de diamants
+              if (typeof updateQuestProgress === 'function') {
+                updateQuestProgress('diamonds', 1);
+              }
+            }
+          }
+        }
+
+        if (pipes.length && pipes[0].x < -50) pipes.shift();
+        if (frames % 100 === 0) addPipe();
+      }
+
+      function drawPipes() {
+        const currentSkin = pipeSkinList[selectedPipeSkin];
+        pipes.forEach(p => {
+          // Dessiner les tuyaux avec le skin sélectionné
+          if (currentSkin.color.startsWith("linear-gradient")) {
+            // Créer un dégradé pour les tuyaux
+            const gradient = ctx.createLinearGradient(p.x, 0, p.x + 50, 0);
+            // Extraire les couleurs du dégradé CSS
+            const colorMatch = currentSkin.color.match(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g);
+            if (colorMatch && colorMatch.length > 1) {
+              colorMatch.forEach((color, index) => {
+                gradient.addColorStop(index / (colorMatch.length - 1), color);
+              });
+            } else {
+              // Fallback si on ne peut pas extraire les couleurs
+              gradient.addColorStop(0, "#4CAF50");
+              gradient.addColorStop(1, "#2E7D32");
+            }
+            ctx.fillStyle = gradient;
+          } else {
+            ctx.fillStyle = currentSkin.color;
+          }
+          ctx.fillRect(p.x, 0, 50, p.top);
+          ctx.fillRect(p.x, p.bottom, 50, canvas.height - p.bottom - 40);
+          
+          // Ajouter des effets spéciaux selon le skin
+          if (currentSkin.name === "Métal") {
+            // Effet métallique
+            ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+            ctx.fillRect(p.x + 2, 0, 46, p.top);
+            ctx.fillRect(p.x + 2, p.bottom, 46, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Or") {
+            // Effet doré
+            ctx.fillStyle = "rgba(255, 215, 0, 0.5)";
+            ctx.fillRect(p.x + 5, 0, 40, p.top);
+            ctx.fillRect(p.x + 5, p.bottom, 40, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Cristal") {
+            // Effet cristal
+            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.fillRect(p.x + 3, 0, 44, p.top);
+            ctx.fillRect(p.x + 3, p.bottom, 44, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Lave") {
+            // Effet lave
+            ctx.fillStyle = "rgba(255, 100, 0, 0.7)";
+            ctx.fillRect(p.x + 2, 0, 46, p.top);
+            ctx.fillRect(p.x + 2, p.bottom, 46, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Arc-en-ciel") {
+            // Effet arc-en-ciel (simulation avec des bandes colorées)
+            const colors = ["#ff0000", "#ff7f00", "#ffff00", "#00ff00", "#0000ff", "#4b0082", "#9400d3"];
+            for (let i = 0; i < colors.length; i++) {
+              ctx.fillStyle = colors[i];
+              const y1 = (p.top / colors.length) * i;
+              const y2 = (p.top / colors.length) * (i + 1);
+              ctx.fillRect(p.x, y1, 50, y2 - y1);
+              
+              const y3 = p.bottom + ((canvas.height - p.bottom - 40) / colors.length) * i;
+              const y4 = p.bottom + ((canvas.height - p.bottom - 40) / colors.length) * (i + 1);
+              ctx.fillRect(p.x, y3, 50, y4 - y3);
+            }
+          }
+          
+          // Effets spéciaux pour les tuyaux de la boutique
+          else if (currentSkin.name === "Cristal Prismatique") {
+            // Effet prismatique avec scintillement
+            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+            for (let i = 0; i < 3; i++) {
+              const x = p.x + 10 + (i * 10);
+              ctx.fillRect(x, 0, 2, p.top);
+              ctx.fillRect(x, p.bottom, 2, canvas.height - p.bottom - 40);
+            }
+          } else if (currentSkin.name === "Or Pur 24K") {
+            // Effet doré premium
+            ctx.fillStyle = "rgba(255, 215, 0, 0.6)";
+            ctx.fillRect(p.x + 5, 0, 5, p.top);
+            ctx.fillRect(p.x + 5, p.bottom, 5, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Diamant Noir") {
+            // Effet diamant noir avec reflets
+            ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+            ctx.fillRect(p.x + 20, 0, 1, p.top);
+            ctx.fillRect(p.x + 20, p.bottom, 1, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Plasma Quantique") {
+            // Effet plasma avec particules
+            ctx.fillStyle = "rgba(0, 255, 255, 0.5)";
+            for (let i = 0; i < 5; i++) {
+              const x = p.x + (i * 8);
+              const y = (frames * 0.1 + i * 20) % p.top;
+              ctx.fillRect(x, y, 2, 2);
+            }
+          } else if (currentSkin.name === "Matière Noire") {
+            // Effet matière noire avec distorsion
+            ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.fillRect(p.x + 15, 0, 3, p.top);
+            ctx.fillRect(p.x + 15, p.bottom, 3, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Énergie Cosmique") {
+            // Effet énergie cosmique
+            ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+            for (let i = 0; i < 4; i++) {
+              const x = p.x + 5 + (i * 10);
+              const y = (frames * 0.05 + i * 15) % p.top;
+              ctx.fillRect(x, y, 1, 3);
+            }
+          }
+        });
+      }
+
+      function drawBackground() {
+        const currentBg = backgroundSkinList[selectedBackgroundSkin];
+        
+        if (currentBg.type === "gradient") {
+          // Créer un dégradé
+          const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+          currentBg.colors.forEach((color, index) => {
+            gradient.addColorStop(index / (currentBg.colors.length - 1), color);
+          });
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Ajouter des effets spéciaux selon l'arrière-plan
+        if (currentBg.name === "Nuit") {
+          // Étoiles pour la nuit (optimisé)
+          ctx.fillStyle = "white";
+          const starCount = 50;
+          for (let i = 0; i < starCount; i++) {
+            const x = (i * 137.5) % canvas.width; // Utiliser une séquence pseudo-aléatoire
+            const y = (i * 89.3) % (canvas.height - 100);
+            const size = (i % 3) + 1;
+            ctx.fillRect(x, y, size, size);
+          }
+        } else if (currentBg.name === "Espace") {
+          // Étoiles plus nombreuses pour l'espace (optimisé)
+          ctx.fillStyle = "white";
+          const starCount = 100;
+          for (let i = 0; i < starCount; i++) {
+            const x = (i * 137.5) % canvas.width;
+            const y = (i * 89.3) % (canvas.height - 100);
+            const size = (i % 4) + 1;
+            ctx.fillRect(x, y, size, size);
+          }
+          // Planète
+          ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+          ctx.beginPath();
+          ctx.arc(canvas.width - 50, 80, 30, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (currentBg.name === "Orage") {
+          // Éclairs (optimisé)
+          if (frames % 30 < 3) { // Éclairs seulement quelques frames
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 3; i++) {
+              const x = (i * 133.7) % canvas.width;
+              ctx.beginPath();
+              ctx.moveTo(x, 0);
+              ctx.lineTo(x + 20, 150);
+              ctx.stroke();
+            }
+          }
+        } else if (currentBg.name === "Arc-en-ciel") {
+          // Nuages arc-en-ciel (optimisé)
+          ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+          for (let i = 0; i < 5; i++) {
+            const x = (i * canvas.width / 5) + Math.sin(frames * 0.01 + i) * 20;
+            const y = 50 + Math.sin(frames * 0.02 + i) * 10;
+            ctx.beginPath();
+            ctx.arc(x, y, 30, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        
+        // Effets spéciaux pour les arrière-plans de la boutique
+        else if (currentBg.name === "Nébuleuse d'Orion") {
+          // Particules de nébuleuse
+          ctx.fillStyle = "rgba(233, 69, 96, 0.3)";
+          for (let i = 0; i < 30; i++) {
+            const x = (i * 47.3) % canvas.width;
+            const y = (i * 31.7) % (canvas.height - 100);
+            const size = (i % 2) + 1;
+            ctx.fillRect(x, y, size, size);
+          }
+        } else if (currentBg.name === "Trou Noir") {
+          // Effet de trou noir avec distorsion
+          ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+          ctx.beginPath();
+          ctx.arc(canvas.width - 100, 100, 50, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Anneau d'accrétion
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(canvas.width - 100, 100, 70, 0, Math.PI * 2);
+          ctx.stroke();
+        } else if (currentBg.name === "Big Bang") {
+          // Explosion de particules
+          ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+          for (let i = 0; i < 20; i++) {
+            const angle = (frames * 0.05 + i * 0.3) % (Math.PI * 2);
+            const radius = (frames * 0.1 + i * 2) % 200;
+            const x = canvas.width / 2 + Math.cos(angle) * radius;
+            const y = canvas.height / 2 + Math.sin(angle) * radius;
+            const size = (i % 3) + 1;
+            ctx.fillRect(x, y, size, size);
+          }
+        } else if (currentBg.name === "Dimension Parallèle") {
+          // Effet de distorsion dimensionnelle
+          ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+          for (let i = 0; i < 15; i++) {
+            const x = (i * 67.3) % canvas.width;
+            const y = (i * 43.7) % (canvas.height - 100);
+            const size = (i % 2) + 2;
+            ctx.fillRect(x, y, size, size);
+          }
+        } else if (currentBg.name === "Univers Holographique") {
+          // Grille holographique
+          ctx.strokeStyle = "rgba(0, 255, 255, 0.2)";
+          ctx.lineWidth = 1;
+          for (let i = 0; i < canvas.width; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.stroke();
+          }
+          for (let i = 0; i < canvas.height; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(canvas.width, i);
+            ctx.stroke();
+          }
+        } else if (currentBg.name === "Multivers Infini") {
+          // Portails dimensionnels
+          ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+          for (let i = 0; i < 8; i++) {
+            const x = (i * canvas.width / 8) + Math.sin(frames * 0.02 + i) * 30;
+            const y = 80 + Math.sin(frames * 0.03 + i) * 20;
+            ctx.beginPath();
+            ctx.arc(x, y, 25, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      function drawGround() {
+        const currentGround = groundSkinList[selectedGroundSkin];
+        
+        if (currentGround.color.startsWith("linear-gradient")) {
+          // Créer un dégradé pour le sol
+          const gradient = ctx.createLinearGradient(0, canvas.height - 40, 0, canvas.height);
+          // Extraire les couleurs du dégradé CSS
+          const colorMatch = currentGround.color.match(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g);
+          if (colorMatch && colorMatch.length > 1) {
+            colorMatch.forEach((color, index) => {
+              gradient.addColorStop(index / (colorMatch.length - 1), color);
+            });
+          } else {
+            // Fallback si on ne peut pas extraire les couleurs
+            gradient.addColorStop(0, "#8BC34A");
+            gradient.addColorStop(1, "#689F38");
+          }
+          ctx.fillStyle = gradient;
+        } else {
+          ctx.fillStyle = currentGround.color;
+        }
+        
+        ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+        
+        // Ajouter des effets spéciaux selon le sol
+        if (currentGround.name === "Neige") {
+          // Flocons de neige
+          ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+          for (let i = 0; i < 10; i++) {
+            const x = (i * 47.3) % canvas.width;
+            const y = canvas.height - 40 + (i * 13.7) % 40;
+            ctx.fillRect(x, y, 2, 2);
+          }
+        } else if (currentGround.name === "Lave") {
+          // Bulles de lave
+          ctx.fillStyle = "rgba(255, 100, 0, 0.6)";
+          for (let i = 0; i < 8; i++) {
+            const x = (i * 67.3) % canvas.width;
+            const y = canvas.height - 40 + (i * 17.3) % 40;
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else if (currentGround.name === "Glace") {
+          // Reflets de glace
+          ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+          for (let i = 0; i < 5; i++) {
+            const x = (i * 89.3) % canvas.width;
+            ctx.fillRect(x, canvas.height - 40, 1, 40);
+          }
+        } else if (currentGround.name === "Cristal") {
+          // Facettes de cristal
+          ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+          for (let i = 0; i < 6; i++) {
+            const x = (i * 73.7) % canvas.width;
+            const y = canvas.height - 40 + (i * 11.3) % 40;
+            ctx.fillRect(x, y, 2, 2);
+          }
+        } else if (currentGround.name === "Métal") {
+          // Rivets métalliques
+          ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+          for (let i = 0; i < 8; i++) {
+            const x = (i * 57.3) % canvas.width;
+            const y = canvas.height - 40 + (i * 7.3) % 40;
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        
+        // Effets spéciaux pour les sols de la boutique
+        else if (currentGround.name === "Or Pur") {
+          // Brillance dorée
+          ctx.fillStyle = "rgba(255, 215, 0, 0.3)";
+          for (let i = 0; i < 12; i++) {
+            const x = (i * 33.7) % canvas.width;
+            const y = canvas.height - 40 + (i * 5.3) % 40;
+            ctx.fillRect(x, y, 1, 1);
+          }
+        } else if (currentGround.name === "Diamant") {
+          // Facettes de diamant
+          ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+          for (let i = 0; i < 15; i++) {
+            const x = (i * 26.7) % canvas.width;
+            const y = canvas.height - 40 + (i * 3.3) % 40;
+            ctx.fillRect(x, y, 1, 1);
+          }
+        } else if (currentGround.name === "Néon") {
+          // Effet néon
+          ctx.fillStyle = "rgba(0, 255, 255, 0.6)";
+          for (let i = 0; i < 10; i++) {
+            const x = (i * 40) % canvas.width;
+            ctx.fillRect(x, canvas.height - 40, 2, 40);
+          }
+        } else if (currentGround.name === "Plasma") {
+          // Particules de plasma
+          ctx.fillStyle = "rgba(255, 64, 129, 0.7)";
+          for (let i = 0; i < 20; i++) {
+            const x = (i * 20) % canvas.width;
+            const y = canvas.height - 40 + (i * 2) % 40;
+            ctx.fillRect(x, y, 1, 1);
+          }
+        } else if (currentGround.name === "Cosmos") {
+          // Étoiles cosmiques
+          ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+          for (let i = 0; i < 25; i++) {
+            const x = (i * 16) % canvas.width;
+            const y = canvas.height - 40 + (i * 1.6) % 40;
+            ctx.fillRect(x, y, 1, 1);
+          }
+        } else if (currentGround.name === "Holographique") {
+          // Lignes holographiques
+          ctx.fillStyle = "rgba(0, 255, 255, 0.4)";
+          for (let i = 0; i < 8; i++) {
+            const x = (i * 50) % canvas.width;
+            ctx.fillRect(x, canvas.height - 40, 1, 40);
+          }
+        }
+      }
+
+      function drawScore() {
+        // Fond semi-transparent pour le score (agrandi pour les vies)
+        const boxHeight = lives > 1 ? 95 : 80;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.fillRect(5, 5, 200, boxHeight);
+        
+        // Bordure pour le score
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(5, 5, 200, boxHeight);
+        
+        // Score actuel - plus visible
+        ctx.fillStyle = "#00ff00";
+        ctx.font = "bold 24px Arial";
+        ctx.fillText(`Score : ${score}`, 15, 30);
+        
+        // Meilleur score - plus visible
+        ctx.fillStyle = "#ffd700";
+        ctx.font = "bold 20px Arial";
+        ctx.fillText(`Meilleur : ${bestScore}`, 15, 55);
+        
+        // Vies supplémentaires (si actives)
+        if (lives > 1) {
+          ctx.fillStyle = "#ff6b6b";
+          ctx.font = "bold 18px Arial";
+          let livesText = "❤️ ";
+          for (let i = 0; i < lives; i++) {
+            livesText += "❤️";
+          }
+          ctx.fillText(livesText, 15, 75);
+        }
+        
+        // Diamants - affichage en jeu
+        const diamonds = parseInt(localStorage.getItem("diamonds") || "0");
+        ctx.fillStyle = "#1976d2";
+        ctx.font = "bold 18px Arial";
+        ctx.fillText(`💎 ${diamonds}`, 15, lives > 1 ? 95 : 80);
+        
+        // Bouton retour au menu - design moderne
+        const gradient = ctx.createLinearGradient(canvas.width - 130, 10, canvas.width - 10, 45);
+        gradient.addColorStop(0, "#4CAF50");
+        gradient.addColorStop(1, "#2E7D32");
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(canvas.width - 130, 10, 120, 35);
+        
+        // Bordure avec effet d'ombre
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(canvas.width - 130, 10, 120, 35);
+        
+        // Bordure intérieure pour effet 3D
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(canvas.width - 129, 11, 118, 33);
+        
+        // Texte avec ombre
+        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.font = "bold 16px Arial";
+        ctx.fillText("🏠 Menu", canvas.width - 118, 35);
+        
+        // Texte principal
+        ctx.fillStyle = "white";
+        ctx.font = "bold 16px Arial";
+        ctx.fillText("🏠 Menu", canvas.width - 120, 32);
+      }
+
+      function draw() {
+        if (!gameRunning) return; // Arrêter si le jeu n'est plus en cours
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBackground();
+        drawGround();
+        drawPipes();
+        drawScore();
+        bird.draw();
+
+        if (gameOver) {
+          registerScore(score);
+          
+          // Mettre à jour les quêtes de score et de parties
+          if (typeof updateQuestProgress === 'function') {
+            updateQuestProgress('score', score);
+            updateQuestProgress('games', 1);
+          }
+          ctx.fillStyle = "rgba(0,0,0,0.5)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "white";
+          ctx.font = "36px Arial";
+          ctx.fillText("Game Over 😵", 90, 280);
+          ctx.font = "20px Arial";
+          ctx.fillText(`Score final : ${score}`, 140, 320);
+          ctx.fillText("Appuie sur ESPACE pour rejouer", 70, 360);
+          ctx.fillText("Clique sur le bouton Menu pour revenir", 50, 390);
+          
+          // Redessiner le bouton menu par-dessus l'overlay
+          ctx.fillStyle = "#222";
+          ctx.fillRect(canvas.width - 120, 10, 110, 30);
+          ctx.fillStyle = "white";
+          ctx.font = "14px Arial";
+          ctx.fillText("🏠 Menu", canvas.width - 110, 30);
+          return;
+        }
+
+        bird.update();
+        updatePipes();
+        frames++;
+        animationId = requestAnimationFrame(draw);
+      }
+
+      function returnToMenu() {
+        gameRunning = false; // Arrêter le jeu
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
+        // Rediriger vers le menu
+        window.location.href = "menu.html?fromGame=true";
+      }
+
+      document.onkeydown = (e) => {
+        if (e.code === "Space") {
+          if (gameOver) {
+            startGame();
+          } else {
+            bird.jump();
+          }
+        }
+        if (e.code === "KeyH") {
+          // Basculer l'affichage de la hitbox
+          const currentHitboxState = localStorage.getItem("showHitbox") === "true";
+          const newHitboxState = !currentHitboxState;
+          localStorage.setItem("showHitbox", newHitboxState);
+          // Redémarrer le jeu pour appliquer le changement
+          if (gameRunning) {
+            startGame();
+          }
+        }
+      };
+
+      // Gestion du clic sur le bouton menu
+      canvas.addEventListener("click", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Vérifier si le clic est sur le bouton menu
+        if (x >= canvas.width - 120 && x <= canvas.width - 10 && 
+            y >= 10 && y <= 40) {
+          returnToMenu();
+        }
+      });
+
+      draw();
     }
-    // ---------------------------
-    
-    updateCasier();
-    updateLeagueUI();
+
+    // 🔹 Démarrer le jeu automatiquement
+    startGame();
   </script>
 </body>
 </html>
