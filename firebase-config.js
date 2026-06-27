@@ -2,7 +2,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyAbMfkHNJaUVvIWKX29_fLLGbhG33uFjGg",
   authDomain: "flappy-emoji-467f6.firebaseapp.com",
-  databaseURL: "https://flappy-emoji-467f6-default-rtdb.firebaseio.com", // Déduit du projectId
+  databaseURL: "https://flappy-emoji-467f6-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "flappy-emoji-467f6",
   storageBucket: "flappy-emoji-467f6.firebasestorage.app",
   messagingSenderId: "875937271617",
