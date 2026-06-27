@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <!-- SDK Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flappy Emoji 🐣</title>
+  <style>
+    body {
+      margin: 0;
+      background: skyblue;
+      font-family: "Segoe UI Emoji", Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .game-layout {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      width: 400px;
+    }
+    .leaderboard {
+      position: absolute;
+      right: calc(100% + 20px);
+      top: 0;
+      width: 220px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 10px;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+    .leaderboard h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      text-align: center;
+    }
+    .leaderboard table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .leaderboard th,
+    .leaderboard td {
+      padding: 6px 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: left;
+    }
+    .leaderboard th:last-child,
+    .leaderboard td:last-child {
+      text-align: right;
+    }
+    .leaderboard tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .leaderboard-empty {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.75);
+      padding: 10px 0 4px;
+      font-size: 13px;
+    }
+    canvas {
+      background: linear-gradient(to bottom, #4ec0ca, #ffffff);
+      border: 2px solid #000;
+      border-radius: 10px;
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="game-layout">
+    <aside class="leaderboard" aria-label="Classement des scores">
+      <h2>🏆 Top 10</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Rang</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+      <div id="leaderboard-empty" class="leaderboard-empty">Aucun score enregistré</div>
+    </aside>
+    <!-- 🎮 Canvas du jeu -->
+    <canvas id="game" width="400" height="600"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const leaderboardBody = document.getElementById("leaderboard-body");
+    const leaderboardEmpty = document.getElementById("leaderboard-empty");
+    const leaderboardStorageKey = "topScores";
+
+    // 🔹 Liste des emojis à débloquer
+    let emojiList = [
+      { emoji: "😁", minScore: 0, isShop: false },
+      { emoji: "😅", minScore: 50, isShop: false },
+      { emoji: "🤣", minScore: 100, isShop: false },
+      { emoji: "😂", minScore: 150, isShop: false },
+      { emoji: "🙂", minScore: 200, isShop: false },
+      { emoji: "🙃", minScore: 250, isShop: false },
+      { emoji: "🫠", minScore: 300, isShop: false },
+      { emoji: "😉", minScore: 350, isShop: false },
+      { emoji: "🥰", minScore: 400, isShop: false },
+      { emoji: "😍", minScore: 450, isShop: false },
+      { emoji: "🤩", minScore: 500, isShop: false },
+      { emoji: "😘", minScore: 550, isShop: false },
+      { emoji: "☺️", minScore: 600, isShop: false },
+      { emoji: "🥲", minScore: 650, isShop: false },
+      { emoji: "😛", minScore: 700, isShop: false },
+      { emoji: "😜", minScore: 750, isShop: false },
+      { emoji: "🤗", minScore: 800, isShop: false },
+      { emoji: "🤭", minScore: 850, isShop: false },
+      { emoji: "🤫", minScore: 900, isShop: false },
+      { emoji: "🤔", minScore: 950, isShop: false },
+      { emoji: "🫡", minScore: 1000, isShop: false },
+      { emoji: "😒", minScore: 1050, isShop: false },
+      { emoji: "🙄", minScore: 1100, isShop: false },
+      { emoji: "🙂‍↔️", minScore: 1150, isShop: false },
+      { emoji: "🙂‍↕️", minScore: 1200, isShop: false },
+      { emoji: "🥵", minScore: 1250, isShop: false },
+      { emoji: "🤯", minScore: 1300, isShop: false },
+      { emoji: "🥳", minScore: 1350, isShop: false },
+      { emoji: "😎", minScore: 1400, isShop: false },
+      { emoji: "🤓", minScore: 1450, isShop: false },
+      { emoji: "😮", minScore: 1500, isShop: false },
+      { emoji: "🥺", minScore: 1550, isShop: false },
+      { emoji: "🥹", minScore: 1600, isShop: false },
+      { emoji: "😥", minScore: 1650, isShop: false },
+      { emoji: "😢", minScore: 1700, isShop: false },
+      { emoji: "😭", minScore: 1750, isShop: false },
+      { emoji: "😱", minScore: 1800, isShop: false },
+      { emoji: "😡", minScore: 1850, isShop: false },
+      { emoji: "😠", minScore: 1900, isShop: false },
+      { emoji: "💩", minScore: 1950, isShop: false },
+      // Emojis de la boutique
+      { emoji: "👑", minScore: 0, isShop: true, shopId: "emoji_0" },
+      { emoji: "💎", minScore: 0, isShop: true, shopId: "emoji_1" },
+      { emoji: "🔥", minScore: 0, isShop: true, shopId: "emoji_2" },
+      { emoji: "⚡", minScore: 0, isShop: true, shopId: "emoji_3" },
+      { emoji: "🌟", minScore: 0, isShop: true, shopId: "emoji_4" }
+    ];
+    
+    // Charger les emojis du Pass Emoji depuis le localStorage
+    function loadPassEmojis() {
+      const savedEmojis = JSON.parse(localStorage.getItem("emojiList") || "[]");
+      const passEmojis = savedEmojis.filter(emoji => emoji.isPassEmoji);
+      
+      // Ajouter les emojis du Pass Emoji à la liste principale
+      passEmojis.forEach(passEmoji => {
+        const exists = emojiList.some(emoji => emoji.emoji === passEmoji.emoji);
+        if (!exists) {
+          emojiList.push(passEmoji);
+        }
+      });
+    }
+    
+    // Charger les emojis du Pass Emoji au démarrage
+    loadPassEmojis();
+
+    // 🔹 Liste des skins de tuyaux à débloquer
+    const pipeSkinList = [
+      { name: "Classique", color: "#4CAF50", minScore: 0, isShop: false },
+      { name: "Métal", color: "#607D8B", minScore: 50, isShop: false },
+      { name: "Or", color: "#FFD700", minScore: 100, isShop: false },
+      { name: "Cristal", color: "#00BCD4", minScore: 150, isShop: false },
+      { name: "Lave", color: "#FF5722", minScore: 200, isShop: false },
+      { name: "Arc-en-ciel", color: "linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3)", minScore: 250, isShop: false },
+      // Tuyaux de la boutique
+      { name: "Cristal Prismatique", color: "linear-gradient(45deg, #ff0080, #00ff80, #8000ff, #ff8000)", minScore: 0, isShop: true, shopId: "pipe_0" },
+      { name: "Or Pur 24K", color: "linear-gradient(45deg, #FFD700, #FFA500, #FF8C00)", minScore: 0, isShop: true, shopId: "pipe_1" },
+      { name: "Diamant Noir", color: "linear-gradient(45deg, #000000, #1a1a1a, #333333)", minScore: 0, isShop: true, shopId: "pipe_2" },
+      { name: "Plasma Quantique", color: "linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ff00)", minScore: 0, isShop: true, shopId: "pipe_3" },
+      { name: "Matière Noire", color: "linear-gradient(45deg, #2c1810, #1a0e0a, #0d0603)", minScore: 0, isShop: true, shopId: "pipe_4" },
+      { name: "Énergie Cosmique", color: "linear-gradient(45deg, #ff6b6b, #4ec0ca, #45b7d1, #96ceb4)", minScore: 0, isShop: true, shopId: "pipe_5" }
+    ];
+
+    // 🔹 Liste des arrière-plans à débloquer
+    const backgroundSkinList = [
+      { name: "Ciel", type: "gradient", colors: ["#4ec0ca", "#ffffff"], minScore: 0, isShop: false },
+      { name: "Coucher", type: "gradient", colors: ["#ff7b7b", "#ff9a56", "#ffad56"], minScore: 50, isShop: false },
+      { name: "Nuit", type: "gradient", colors: ["#2c3e50", "#34495e", "#1a252f"], minScore: 100, isShop: false },
+      { name: "Aurore", type: "gradient", colors: ["#667eea", "#764ba2", "#f093fb"], minScore: 150, isShop: false },
+      { name: "Orage", type: "gradient", colors: ["#434343", "#000000", "#2c3e50"], minScore: 200, isShop: false },
+      { name: "Espace", type: "gradient", colors: ["#0c0c0c", "#1a1a2e", "#16213e"], minScore: 250, isShop: false },
+      { name: "Arc-en-ciel", type: "gradient", colors: ["#ff0000", "#ff7f00", "#ffff00", "#00ff00", "#0000ff", "#4b0082", "#9400d3"], minScore: 300, isShop: false },
+      // Arrière-plans de la boutique
+      { name: "Nébuleuse d'Orion", type: "gradient", colors: ["#0c0c0c", "#1a1a2e", "#16213e", "#0f3460", "#e94560"], minScore: 0, isShop: true, shopId: "bg_0" },
+      { name: "Trou Noir", type: "gradient", colors: ["#000000", "#1a1a1a", "#2d2d2d", "#000000"], minScore: 0, isShop: true, shopId: "bg_1" },
+      { name: "Big Bang", type: "gradient", colors: ["#ff0000", "#ff8000", "#ffff00", "#00ff00", "#0080ff", "#8000ff"], minScore: 0, isShop: true, shopId: "bg_2" },
+      { name: "Dimension Parallèle", type: "gradient", colors: ["#667eea", "#764ba2", "#f093fb", "#f5576c", "#4facfe"], minScore: 0, isShop: true, shopId: "bg_3" },
+      { name: "Univers Holographique", type: "gradient", colors: ["#ff00ff", "#00ffff", "#ffff00", "#ff0080", "#8000ff"], minScore: 0, isShop: true, shopId: "bg_4" },
+      { name: "Multivers Infini", type: "gradient", colors: ["#ff6b6b", "#4ec0ca", "#45b7d1", "#96ceb4", "#feca57", "#ff9ff3"], minScore: 0, isShop: true, shopId: "bg_5" }
+    ];
+
+    // 🔹 Liste des skins de sols à débloquer
+    const groundSkinList = [
+      { name: "Herbe", color: "#8BC34A", minScore: 0, isShop: false },
+      { name: "Sable", color: "#FFC107", minScore: 50, isShop: false },
+      { name: "Neige", color: "#E1F5FE", minScore: 100, isShop: false },
+      { name: "Lave", color: "#FF5722", minScore: 150, isShop: false },
+      { name: "Glace", color: "#81D4FA", minScore: 200, isShop: false },
+      { name: "Cristal", color: "#E1BEE7", minScore: 250, isShop: false },
+      { name: "Métal", color: "#607D8B", minScore: 300, isShop: false },
+      // Sols de la boutique
+      { name: "Or Pur", color: "linear-gradient(45deg, #FFD700, #FFA500)", minScore: 0, isShop: true, shopId: "ground_0" },
+      { name: "Diamant", color: "linear-gradient(45deg, #E1F5FE, #B3E5FC, #81D4FA)", minScore: 0, isShop: true, shopId: "ground_1" },
+      { name: "Néon", color: "linear-gradient(45deg, #00E676, #00BCD4, #3F51B5)", minScore: 0, isShop: true, shopId: "ground_2" },
+      { name: "Plasma", color: "linear-gradient(45deg, #FF4081, #E91E63, #9C27B0)", minScore: 0, isShop: true, shopId: "ground_3" },
+      { name: "Cosmos", color: "linear-gradient(45deg, #1A1A2E, #16213E, #0F3460)", minScore: 0, isShop: true, shopId: "ground_4" },
+      { name: "Holographique", color: "linear-gradient(45deg, #FF00FF, #00FFFF, #FFFF00)", minScore: 0, isShop: true, shopId: "ground_5" }
+    ];
+
+    // 🔹 Charger les données depuis le navigateur
+    let bestScore = parseInt(localStorage.getItem("bestScore") || "0");
+    let cumulativeScore = parseInt(localStorage.getItem("cumulativeScore") || "0");
+    let selectedEmoji = localStorage.getItem("selectedEmoji") || "😁";
+    let selectedPipeSkin = parseInt(localStorage.getItem("selectedPipeSkin") || "0");
+    let selectedBackgroundSkin = parseInt(localStorage.getItem("selectedBackgroundSkin") || "0");
+    let selectedGroundSkin = parseInt(localStorage.getItem("selectedGroundSkin") || "0");
+    
+    function getLeaderboardScores() {
+      const savedScores = JSON.parse(localStorage.getItem(leaderboardStorageKey) || "[]");
+      return savedScores
+        .map(value => parseInt(value, 10))
+        .filter(value => Number.isFinite(value) && value >= 0)
+        .sort((a, b) => b - a)
+        .slice(0, 10);
+    }
+
+    function saveLeaderboardScores(scores) {
+      localStorage.setItem(leaderboardStorageKey, JSON.stringify(scores));
+    }
+
+    function renderLeaderboard() {
+      db.ref('leaderboard').orderByChild('score').limitToLast(10).on('value', (snap) => {
+        leaderboardBody.innerHTML = "";
+        const scores = [];
+        snap.forEach(c => scores.push(c.val()));
+        if (scores.length === 0) {
+          leaderboardEmpty.style.display = "block";
+          return;
+        }
+        leaderboardEmpty.style.display = "none";
+        scores.reverse().forEach((s, i) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>#${i+1} ${s.username || ''}</td><td>${s.score}</td>`;
+          leaderboardBody.appendChild(row);
+        });
+      });
+    }
+
+    function registerScore(scoreValue) {
+      if (!Number.isFinite(scoreValue) || scoreValue < 0) return;
+
+      cumulativeScore += Math.floor(scoreValue);
+      localStorage.setItem("cumulativeScore", cumulativeScore);
+
+      // --- SYNC CLOUD ---
+      const currentUsername = sessionStorage.getItem("currentUsername");
+      if (currentUsername) {
+          let best = parseInt(localStorage.getItem("bestScore") || "0");
+          if (scoreValue > best) {
+              localStorage.setItem("bestScore", scoreValue);
+              cloudSave("bestScore", scoreValue);
+          }
+          db.ref('leaderboard').push({
+              username: currentUsername,
+              score: scoreValue,
+              timestamp: Date.now()
+          });
+      }
+
+      const updatedScores = getLeaderboardScores();
+      updatedScores.push(scoreValue);
+      updatedScores.sort((a, b) => b - a);
+      const topScores = updatedScores.slice(0, 10);
+      saveLeaderboardScores(topScores);
+
+      if (topScores.length > 0) {
+        bestScore = topScores[0];
+        localStorage.setItem("bestScore", bestScore);
+      }
+
+      renderLeaderboard();
+    }
+
+    // Compatibilité : injecter l'ancien meilleur score s'il existe
+    if (bestScore > 0 && getLeaderboardScores().length === 0) {
+      saveLeaderboardScores([bestScore]);
+    }
+    renderLeaderboard();
+
+    // 🔹 Fonction pour vérifier si un skin de boutique est possédé
+    function isShopItemOwned(shopId) {
+      const ownedItems = JSON.parse(localStorage.getItem("ownedItems") || "[]");
+      return ownedItems.includes(shopId);
+    }
+    
+    // 🔹 Fonction pour vérifier si un skin est débloqué (score ou boutique)
+    function isSkinUnlocked(item) {
+      if (item.isShop) {
+        return isShopItemOwned(item.shopId);
+      } else if (item.isPassEmoji) {
+        // Les emojis du Pass Emoji se débloquent via le score cumulé
+        return cumulativeScore >= item.minScore;
+      } else {
+        return bestScore >= item.minScore;
+      }
+    }
+    
+    // 🔹 Fonction pour valider et corriger les sélections de skins
+    function validateSkinSelections() {
+      // Vérifier l'emoji sélectionné
+      const emojiIndex = emojiList.findIndex(e => e.emoji === selectedEmoji);
+      if (emojiIndex === -1 || !isSkinUnlocked(emojiList[emojiIndex])) {
+        // Trouver le premier emoji débloqué
+        const unlockedEmoji = emojiList.find(e => isSkinUnlocked(e));
+        if (unlockedEmoji) {
+          selectedEmoji = unlockedEmoji.emoji;
+          localStorage.setItem("selectedEmoji", selectedEmoji);
+        } else {
+          // Si aucun emoji n'est débloqué, utiliser le premier
+          selectedEmoji = emojiList[0].emoji;
+          localStorage.setItem("selectedEmoji", selectedEmoji);
+        }
+      }
+      
+      // Vérifier le skin de tuyau sélectionné
+      if (selectedPipeSkin >= pipeSkinList.length || !isSkinUnlocked(pipeSkinList[selectedPipeSkin])) {
+        // Trouver le premier skin de tuyau débloqué
+        const unlockedPipeIndex = pipeSkinList.findIndex(skin => isSkinUnlocked(skin));
+        if (unlockedPipeIndex !== -1) {
+          selectedPipeSkin = unlockedPipeIndex;
+          localStorage.setItem("selectedPipeSkin", selectedPipeSkin);
+        } else {
+          // Si aucun skin n'est débloqué, utiliser le premier
+          selectedPipeSkin = 0;
+          localStorage.setItem("selectedPipeSkin", selectedPipeSkin);
+        }
+      }
+      
+      // Vérifier l'arrière-plan sélectionné
+      if (selectedBackgroundSkin >= backgroundSkinList.length || !isSkinUnlocked(backgroundSkinList[selectedBackgroundSkin])) {
+        // Trouver le premier arrière-plan débloqué
+        const unlockedBgIndex = backgroundSkinList.findIndex(bg => isSkinUnlocked(bg));
+        if (unlockedBgIndex !== -1) {
+          selectedBackgroundSkin = unlockedBgIndex;
+          localStorage.setItem("selectedBackgroundSkin", selectedBackgroundSkin);
+        } else {
+          // Si aucun arrière-plan n'est débloqué, utiliser le premier
+          selectedBackgroundSkin = 0;
+          localStorage.setItem("selectedBackgroundSkin", selectedBackgroundSkin);
+        }
+      }
+      
+      // Vérifier le sol sélectionné
+      if (selectedGroundSkin >= groundSkinList.length || !isSkinUnlocked(groundSkinList[selectedGroundSkin])) {
+        // Trouver le premier sol débloqué
+        const unlockedGroundIndex = groundSkinList.findIndex(ground => isSkinUnlocked(ground));
+        if (unlockedGroundIndex !== -1) {
+          selectedGroundSkin = unlockedGroundIndex;
+          localStorage.setItem("selectedGroundSkin", selectedGroundSkin);
+        } else {
+          // Si aucun sol n'est débloqué, utiliser le premier
+          selectedGroundSkin = 0;
+          localStorage.setItem("selectedGroundSkin", selectedGroundSkin);
+        }
+      }
+    }
+
+    // 🕹️ ---- JEU ----
+    let gameRunning = false;
+    let animationId = null;
+    let devMenuOpen = false; // Menu développeur ouvert
+    
+    function startGame() {
+      // Valider les sélections de skins avant de démarrer
+      validateSkinSelections();
+      
+      // Charger l'état de la hitbox
+      let showHitbox = localStorage.getItem("showHitbox") === "true";
+      
+      gameRunning = true;
+      let frames = 0;
+      const gravity = 0.25;
+      const jump = 4.6;
+      
+      // 🔹 Charger les bonus actifs et filtrer ceux expirés
+      let activeBonuses = JSON.parse(localStorage.getItem("activeBonuses") || "[]");
+      const ownedBonusesExpiry = JSON.parse(localStorage.getItem("ownedBonusesExpiry") || "{}");
+      const nowTs = Date.now();
+      activeBonuses = activeBonuses.filter(id => (ownedBonusesExpiry[id] || 0) > nowTs);
+      const startPointsBonuses = [
+        { id: "start_10", points: 10 },
+        { id: "start_20", points: 20 },
+        { id: "start_30", points: 30 },
+        { id: "start_50", points: 50 }
+      ];
+      
+      // Calculer les points de départ
+      let startBonus = 0;
+      activeBonuses.forEach(bonusId => {
+        const bonus = startPointsBonuses.find(b => b.id === bonusId);
+        if (bonus) {
+          startBonus = Math.max(startBonus, bonus.points);
+        }
+      });
+      
+      // Calculer les vies supplémentaires
+      const extraLivesBonuses = [
+        { id: "life_1", lives: 1 },
+        { id: "life_2", lives: 2 }
+      ];
+      let extraLives = 0;
+      activeBonuses.forEach(bonusId => {
+        const bonus = extraLivesBonuses.find(b => b.id === bonusId);
+        if (bonus) {
+          extraLives = Math.max(extraLives, bonus.lives);
+        }
+      });
+      
+      let score = startBonus; // Commencer avec les points de bonus
+      let lives = 1 + extraLives; // Vies initiales + bonus
+      let gameOver = false;
+      const pipes = [];
+
+      const bird = {
+        x: 60,
+        y: 150,
+        size: 36,
+        velocity: 0,
+        jump() {
+          this.velocity = -jump;
+        },
+        update() {
+          this.velocity += gravity;
+          this.y += this.velocity;
+
+          if (this.y + this.size > canvas.height - 40) {
+            this.y = canvas.height - 40 - this.size;
+            if (lives > 1) {
+              lives--;
+              this.y = canvas.height / 2;
+              this.velocity = 0;
+            } else {
+              gameOver = true;
+            }
+          }
+          if (this.y < 0) {
+            this.y = 0;
+            if (lives > 1) {
+              lives--;
+              this.y = canvas.height / 2;
+              this.velocity = 0;
+            } else {
+              this.velocity = 0;
+            }
+          }
+        },
+        getHitBox() {
+          // Cercle de collision centré sur l'emoji
+          const centerX = this.x + this.size * 0.67; // Décalé vers la droite à 70%
+          const centerY = this.y - this.size * 0.35; // Ajustement pour centrer sur l'emoji
+          const radius = this.size * 0.35; // 35% de la taille de l'emoji (diamètre = 70%)
+          
+          return {
+            x: centerX,
+            y: centerY,
+            radius: radius
+          };
+        },
+        draw() {
+          // Dessin de l'emoji
+          ctx.font = `${this.size}px "Segoe UI Emoji"`;
+          ctx.fillText(selectedEmoji, this.x, this.y);
+
+          // 🔴 Dessiner la hitbox circulaire (si activée)
+          if (showHitbox) {
+            const hit = this.getHitBox();
+            ctx.strokeStyle = "rgba(255, 0, 0, 0.6)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(hit.x, hit.y, hit.radius, 0, 2 * Math.PI);
+            ctx.stroke();
+          }
+        }
+      };
+
+      function addPipe() {
+        const top = Math.random() * 200 + 50;
+        const gap = 120;
+        pipes.push({ x: canvas.width, top: top, bottom: top + gap, passed: false });
+      }
+
+      function getPipeSpeed() {
+        const baseSpeed = 2;
+        const speedThreshold = 30;
+        const speedIncreasePerPoint = 0.015;
+        const maxSpeed = 5;
+
+        if (score <= speedThreshold) {
+          return baseSpeed;
+        }
+
+        const extraPoints = score - speedThreshold;
+        return Math.min(maxSpeed, baseSpeed + extraPoints * speedIncreasePerPoint);
+      }
+
+      function updatePipes() {
+        const pipeSpeed = getPipeSpeed();
+
+        for (let i = 0; i < pipes.length; i++) {
+          const p = pipes[i];
+          p.x -= pipeSpeed;
+
+          // Collision circulaire avec les tuyaux
+          const hit = bird.getHitBox();
+          const pipeLeft = p.x + 5;
+          const pipeRight = p.x + 45;
+          const pipeTop = p.top - 5;
+          const pipeBottom = p.bottom + 5;
+          
+          // Vérifier si le cercle touche le tuyau
+          if (hit.x + hit.radius > pipeLeft && hit.x - hit.radius < pipeRight) {
+            // Le cercle est dans la zone horizontale du tuyau
+            if (hit.y - hit.radius < pipeTop || hit.y + hit.radius > pipeBottom) {
+              // Le cercle touche le tuyau par le haut ou le bas
+              if (lives > 1) {
+                // Utiliser une vie supplémentaire
+                lives--;
+                // Repositionner l'oiseau au centre
+                bird.y = canvas.height / 2;
+                bird.velocity = 0;
+                // Retirer ce tuyau pour éviter un game over immédiat
+                pipes.splice(i, 1);
+                // Continuer la boucle sans incrémenter i pour éviter de manquer le prochain tuyau
+                continue;
+              } else {
+                gameOver = true;
+              }
+            }
+          }
+
+          if (!p.passed && p.x + 50 < bird.x) {
+            p.passed = true;
+            score++;
+            // Gagner 1 diamant tous les 30 points
+            if (score % 30 === 0) {
+              let diamonds = parseInt(localStorage.getItem("diamonds") || "0");
+              diamonds++;
+              localStorage.setItem("diamonds", diamonds.toString());
+              
+              // Mettre à jour les quêtes de diamants
+              if (typeof updateQuestProgress === 'function') {
+                updateQuestProgress('diamonds', 1);
+              }
+            }
+          }
+        }
+
+        if (pipes.length && pipes[0].x < -50) pipes.shift();
+        if (frames % 100 === 0) addPipe();
+      }
+
+      function drawPipes() {
+        const currentSkin = pipeSkinList[selectedPipeSkin];
+        pipes.forEach(p => {
+          // Dessiner les tuyaux avec le skin sélectionné
+          if (currentSkin.color.startsWith("linear-gradient")) {
+            // Créer un dégradé pour les tuyaux
+            const gradient = ctx.createLinearGradient(p.x, 0, p.x + 50, 0);
+            // Extraire les couleurs du dégradé CSS
+            const colorMatch = currentSkin.color.match(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g);
+            if (colorMatch && colorMatch.length > 1) {
+              colorMatch.forEach((color, index) => {
+                gradient.addColorStop(index / (colorMatch.length - 1), color);
+              });
+            } else {
+              // Fallback si on ne peut pas extraire les couleurs
+              gradient.addColorStop(0, "#4CAF50");
+              gradient.addColorStop(1, "#2E7D32");
+            }
+            ctx.fillStyle = gradient;
+          } else {
+            ctx.fillStyle = currentSkin.color;
+          }
+          ctx.fillRect(p.x, 0, 50, p.top);
+          ctx.fillRect(p.x, p.bottom, 50, canvas.height - p.bottom - 40);
+          
+          // Ajouter des effets spéciaux selon le skin
+          if (currentSkin.name === "Métal") {
+            // Effet métallique
+            ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+            ctx.fillRect(p.x + 2, 0, 46, p.top);
+            ctx.fillRect(p.x + 2, p.bottom, 46, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Or") {
+            // Effet doré
+            ctx.fillStyle = "rgba(255, 215, 0, 0.5)";
+            ctx.fillRect(p.x + 5, 0, 40, p.top);
+            ctx.fillRect(p.x + 5, p.bottom, 40, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Cristal") {
+            // Effet cristal
+            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.fillRect(p.x + 3, 0, 44, p.top);
+            ctx.fillRect(p.x + 3, p.bottom, 44, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Lave") {
+            // Effet lave
+            ctx.fillStyle = "rgba(255, 100, 0, 0.7)";
+            ctx.fillRect(p.x + 2, 0, 46, p.top);
+            ctx.fillRect(p.x + 2, p.bottom, 46, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Arc-en-ciel") {
+            // Effet arc-en-ciel (simulation avec des bandes colorées)
+            const colors = ["#ff0000", "#ff7f00", "#ffff00", "#00ff00", "#0000ff", "#4b0082", "#9400d3"];
+            for (let i = 0; i < colors.length; i++) {
+              ctx.fillStyle = colors[i];
+              const y1 = (p.top / colors.length) * i;
+              const y2 = (p.top / colors.length) * (i + 1);
+              ctx.fillRect(p.x, y1, 50, y2 - y1);
+              
+              const y3 = p.bottom + ((canvas.height - p.bottom - 40) / colors.length) * i;
+              const y4 = p.bottom + ((canvas.height - p.bottom - 40) / colors.length) * (i + 1);
+              ctx.fillRect(p.x, y3, 50, y4 - y3);
+            }
+          }
+          
+          // Effets spéciaux pour les tuyaux de la boutique
+          else if (currentSkin.name === "Cristal Prismatique") {
+            // Effet prismatique avec scintillement
+            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+            for (let i = 0; i < 3; i++) {
+              const x = p.x + 10 + (i * 10);
+              ctx.fillRect(x, 0, 2, p.top);
+              ctx.fillRect(x, p.bottom, 2, canvas.height - p.bottom - 40);
+            }
+          } else if (currentSkin.name === "Or Pur 24K") {
+            // Effet doré premium
+            ctx.fillStyle = "rgba(255, 215, 0, 0.6)";
+            ctx.fillRect(p.x + 5, 0, 5, p.top);
+            ctx.fillRect(p.x + 5, p.bottom, 5, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Diamant Noir") {
+            // Effet diamant noir avec reflets
+            ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+            ctx.fillRect(p.x + 20, 0, 1, p.top);
+            ctx.fillRect(p.x + 20, p.bottom, 1, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Plasma Quantique") {
+            // Effet plasma avec particules
+            ctx.fillStyle = "rgba(0, 255, 255, 0.5)";
+            for (let i = 0; i < 5; i++) {
+              const x = p.x + (i * 8);
+              const y = (frames * 0.1 + i * 20) % p.top;
+              ctx.fillRect(x, y, 2, 2);
+            }
+          } else if (currentSkin.name === "Matière Noire") {
+            // Effet matière noire avec distorsion
+            ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.fillRect(p.x + 15, 0, 3, p.top);
+            ctx.fillRect(p.x + 15, p.bottom, 3, canvas.height - p.bottom - 40);
+          } else if (currentSkin.name === "Énergie Cosmique") {
+            // Effet énergie cosmique
+            ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+            for (let i = 0; i < 4; i++) {
+              const x = p.x + 5 + (i * 10);
+              const y = (frames * 0.05 + i * 15) % p.top;
+              ctx.fillRect(x, y, 1, 3);
+            }
+          }
+        });
+      }
+
+      function drawBackground() {
+        const currentBg = backgroundSkinList[selectedBackgroundSkin];
+        
+        if (currentBg.type === "gradient") {
+          // Créer un dégradé
+          const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+          currentBg.colors.forEach((color, index) => {
+            gradient.addColorStop(index / (currentBg.colors.length - 1), color);
+          });
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Ajouter des effets spéciaux selon l'arrière-plan
+        if (currentBg.name === "Nuit") {
+          // Étoiles pour la nuit (optimisé)
+          ctx.fillStyle = "white";
+          const starCount = 50;
+          for (let i = 0; i < starCount; i++) {
+            const x = (i * 137.5) % canvas.width; // Utiliser une séquence pseudo-aléatoire
+            const y = (i * 89.3) % (canvas.height - 100);
+            const size = (i % 3) + 1;
+            ctx.fillRect(x, y, size, size);
+          }
+        } else if (currentBg.name === "Espace") {
+          // Étoiles plus nombreuses pour l'espace (optimisé)
+          ctx.fillStyle = "white";
+          const starCount = 100;
+          for (let i = 0; i < starCount; i++) {
+            const x = (i * 137.5) % canvas.width;
+            const y = (i * 89.3) % (canvas.height - 100);
+            const size = (i % 4) + 1;
+            ctx.fillRect(x, y, size, size);
+          }
+          // Planète
+          ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+          ctx.beginPath();
+          ctx.arc(canvas.width - 50, 80, 30, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (currentBg.name === "Orage") {
+          // Éclairs (optimisé)
+          if (frames % 30 < 3) { // Éclairs seulement quelques frames
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 3; i++) {
+              const x = (i * 133.7) % canvas.width;
+              ctx.beginPath();
+              ctx.moveTo(x, 0);
+              ctx.lineTo(x + 20, 150);
+              ctx.stroke();
+            }
+          }
+        } else if (currentBg.name === "Arc-en-ciel") {
+          // Nuages arc-en-ciel (optimisé)
+          ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+          for (let i = 0; i < 5; i++) {
+            const x = (i * canvas.width / 5) + Math.sin(frames * 0.01 + i) * 20;
+            const y = 50 + Math.sin(frames * 0.02 + i) * 10;
+            ctx.beginPath();
+            ctx.arc(x, y, 30, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        
+        // Effets spéciaux pour les arrière-plans de la boutique
+        else if (currentBg.name === "Nébuleuse d'Orion") {
+          // Particules de nébuleuse
+          ctx.fillStyle = "rgba(233, 69, 96, 0.3)";
+          for (let i = 0; i < 30; i++) {
+            const x = (i * 47.3) % canvas.width;
+            const y = (i * 31.7) % (canvas.height - 100);
+            const size = (i % 2) + 1;
+            ctx.fillRect(x, y, size, size);
+          }
+        } else if (currentBg.name === "Trou Noir") {
+          // Effet de trou noir avec distorsion
+          ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+          ctx.beginPath();
+          ctx.arc(canvas.width - 100, 100, 50, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Anneau d'accrétion
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(canvas.width - 100, 100, 70, 0, Math.PI * 2);
+          ctx.stroke();
+        } else if (currentBg.name === "Big Bang") {
+          // Explosion de particules
+          ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+          for (let i = 0; i < 20; i++) {
+            const angle = (frames * 0.05 + i * 0.3) % (Math.PI * 2);
+            const radius = (frames * 0.1 + i * 2) % 200;
+            const x = canvas.width / 2 + Math.cos(angle) * radius;
+            const y = canvas.height / 2 + Math.sin(angle) * radius;
+            const size = (i % 3) + 1;
+            ctx.fillRect(x, y, size, size);
+          }
+        } else if (currentBg.name === "Dimension Parallèle") {
+          // Effet de distorsion dimensionnelle
+          ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+          for (let i = 0; i < 15; i++) {
+            const x = (i * 67.3) % canvas.width;
+            const y = (i * 43.7) % (canvas.height - 100);
+            const size = (i % 2) + 2;
+            ctx.fillRect(x, y, size, size);
+          }
+        } else if (currentBg.name === "Univers Holographique") {
+          // Grille holographique
+          ctx.strokeStyle = "rgba(0, 255, 255, 0.2)";
+          ctx.lineWidth = 1;
+          for (let i = 0; i < canvas.width; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(i, 0);
+            ctx.lineTo(i, canvas.height);
+            ctx.stroke();
+          }
+          for (let i = 0; i < canvas.height; i += 40) {
+            ctx.beginPath();
+            ctx.moveTo(0, i);
+            ctx.lineTo(canvas.width, i);
+            ctx.stroke();
+          }
+        } else if (currentBg.name === "Multivers Infini") {
+          // Portails dimensionnels
+          ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+          for (let i = 0; i < 8; i++) {
+            const x = (i * canvas.width / 8) + Math.sin(frames * 0.02 + i) * 30;
+            const y = 80 + Math.sin(frames * 0.03 + i) * 20;
+            ctx.beginPath();
+            ctx.arc(x, y, 25, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      function drawGround() {
+        const currentGround = groundSkinList[selectedGroundSkin];
+        
+        if (currentGround.color.startsWith("linear-gradient")) {
+          // Créer un dégradé pour le sol
+          const gradient = ctx.createLinearGradient(0, canvas.height - 40, 0, canvas.height);
+          // Extraire les couleurs du dégradé CSS
+          const colorMatch = currentGround.color.match(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g);
+          if (colorMatch && colorMatch.length > 1) {
+            colorMatch.forEach((color, index) => {
+              gradient.addColorStop(index / (colorMatch.length - 1), color);
+            });
+          } else {
+            // Fallback si on ne peut pas extraire les couleurs
+            gradient.addColorStop(0, "#8BC34A");
+            gradient.addColorStop(1, "#689F38");
+          }
+          ctx.fillStyle = gradient;
+        } else {
+          ctx.fillStyle = currentGround.color;
+        }
+        
+        ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+        
+        // Ajouter des effets spéciaux selon le sol
+        if (currentGround.name === "Neige") {
+          // Flocons de neige
+          ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+          for (let i = 0; i < 10; i++) {
+            const x = (i * 47.3) % canvas.width;
+            const y = canvas.height - 40 + (i * 13.7) % 40;
+            ctx.fillRect(x, y, 2, 2);
+          }
+        } else if (currentGround.name === "Lave") {
+          // Bulles de lave
+          ctx.fillStyle = "rgba(255, 100, 0, 0.6)";
+          for (let i = 0; i < 8; i++) {
+            const x = (i * 67.3) % canvas.width;
+            const y = canvas.height - 40 + (i * 17.3) % 40;
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else if (currentGround.name === "Glace") {
+          // Reflets de glace
+          ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+          for (let i = 0; i < 5; i++) {
+            const x = (i * 89.3) % canvas.width;
+            ctx.fillRect(x, canvas.height - 40, 1, 40);
+          }
+        } else if (currentGround.name === "Cristal") {
+          // Facettes de cristal
+          ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+          for (let i = 0; i < 6; i++) {
+            const x = (i * 73.7) % canvas.width;
+            const y = canvas.height - 40 + (i * 11.3) % 40;
+            ctx.fillRect(x, y, 2, 2);
+          }
+        } else if (currentGround.name === "Métal") {
+          // Rivets métalliques
+          ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+          for (let i = 0; i < 8; i++) {
+            const x = (i * 57.3) % canvas.width;
+            const y = canvas.height - 40 + (i * 7.3) % 40;
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        
+        // Effets spéciaux pour les sols de la boutique
+        else if (currentGround.name === "Or Pur") {
+          // Brillance dorée
+          ctx.fillStyle = "rgba(255, 215, 0, 0.3)";
+          for (let i = 0; i < 12; i++) {
+            const x = (i * 33.7) % canvas.width;
+            const y = canvas.height - 40 + (i * 5.3) % 40;
+            ctx.fillRect(x, y, 1, 1);
+          }
+        } else if (currentGround.name === "Diamant") {
+          // Facettes de diamant
+          ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+          for (let i = 0; i < 15; i++) {
+            const x = (i * 26.7) % canvas.width;
+            const y = canvas.height - 40 + (i * 3.3) % 40;
+            ctx.fillRect(x, y, 1, 1);
+          }
+        } else if (currentGround.name === "Néon") {
+          // Effet néon
+          ctx.fillStyle = "rgba(0, 255, 255, 0.6)";
+          for (let i = 0; i < 10; i++) {
+            const x = (i * 40) % canvas.width;
+            ctx.fillRect(x, canvas.height - 40, 2, 40);
+          }
+        } else if (currentGround.name === "Plasma") {
+          // Particules de plasma
+          ctx.fillStyle = "rgba(255, 64, 129, 0.7)";
+          for (let i = 0; i < 20; i++) {
+            const x = (i * 20) % canvas.width;
+            const y = canvas.height - 40 + (i * 2) % 40;
+            ctx.fillRect(x, y, 1, 1);
+          }
+        } else if (currentGround.name === "Cosmos") {
+          // Étoiles cosmiques
+          ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+          for (let i = 0; i < 25; i++) {
+            const x = (i * 16) % canvas.width;
+            const y = canvas.height - 40 + (i * 1.6) % 40;
+            ctx.fillRect(x, y, 1, 1);
+          }
+        } else if (currentGround.name === "Holographique") {
+          // Lignes holographiques
+          ctx.fillStyle = "rgba(0, 255, 255, 0.4)";
+          for (let i = 0; i < 8; i++) {
+            const x = (i * 50) % canvas.width;
+            ctx.fillRect(x, canvas.height - 40, 1, 40);
+          }
+        }
+      }
+
+      function drawScore() {
+        // Fond semi-transparent pour le score (agrandi pour les vies)
+        const boxHeight = lives > 1 ? 95 : 80;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.fillRect(5, 5, 200, boxHeight);
+        
+        // Bordure pour le score
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(5, 5, 200, boxHeight);
+        
+        // Score actuel - plus visible
+        ctx.fillStyle = "#00ff00";
+        ctx.font = "bold 24px Arial";
+        ctx.fillText(`Score : ${score}`, 15, 30);
+        
+        // Meilleur score - plus visible
+        ctx.fillStyle = "#ffd700";
+        ctx.font = "bold 20px Arial";
+        ctx.fillText(`Meilleur : ${bestScore}`, 15, 55);
+        
+        // Vies supplémentaires (si actives)
+        if (lives > 1) {
+          ctx.fillStyle = "#ff6b6b";
+          ctx.font = "bold 18px Arial";
+          let livesText = "❤️ ";
+          for (let i = 0; i < lives; i++) {
+            livesText += "❤️";
+          }
+          ctx.fillText(livesText, 15, 75);
+        }
+        
+        // Diamants - affichage en jeu
+        const diamonds = parseInt(localStorage.getItem("diamonds") || "0");
+        ctx.fillStyle = "#1976d2";
+        ctx.font = "bold 18px Arial";
+        ctx.fillText(`💎 ${diamonds}`, 15, lives > 1 ? 95 : 80);
+        
+        // Bouton retour au menu - design moderne
+        const gradient = ctx.createLinearGradient(canvas.width - 130, 10, canvas.width - 10, 45);
+        gradient.addColorStop(0, "#4CAF50");
+        gradient.addColorStop(1, "#2E7D32");
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(canvas.width - 130, 10, 120, 35);
+        
+        // Bordure avec effet d'ombre
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(canvas.width - 130, 10, 120, 35);
+        
+        // Bordure intérieure pour effet 3D
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(canvas.width - 129, 11, 118, 33);
+        
+        // Texte avec ombre
+        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.font = "bold 16px Arial";
+        ctx.fillText("🏠 Menu", canvas.width - 118, 35);
+        
+        // Texte principal
+        ctx.fillStyle = "white";
+        ctx.font = "bold 16px Arial";
+        ctx.fillText("🏠 Menu", canvas.width - 120, 32);
+      }
+
+      function draw() {
+        if (!gameRunning) return; // Arrêter si le jeu n'est plus en cours
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBackground();
+        drawGround();
+        drawPipes();
+        drawScore();
+        bird.draw();
+
+        if (gameOver) {
+          registerScore(score);
+          
+          // Mettre à jour les quêtes de score et de parties
+          if (typeof updateQuestProgress === 'function') {
+            updateQuestProgress('score', score);
+            updateQuestProgress('games', 1);
+          }
+          ctx.fillStyle = "rgba(0,0,0,0.5)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "white";
+          ctx.font = "36px Arial";
+          ctx.fillText("Game Over 😵", 90, 280);
+          ctx.font = "20px Arial";
+          ctx.fillText(`Score final : ${score}`, 140, 320);
+          ctx.fillText("Appuie sur ESPACE pour rejouer", 70, 360);
+          ctx.fillText("Clique sur le bouton Menu pour revenir", 50, 390);
+          
+          // Redessiner le bouton menu par-dessus l'overlay
+          ctx.fillStyle = "#222";
+          ctx.fillRect(canvas.width - 120, 10, 110, 30);
+          ctx.fillStyle = "white";
+          ctx.font = "14px Arial";
+          ctx.fillText("🏠 Menu", canvas.width - 110, 30);
+          return;
+        }
+
+        bird.update();
+        updatePipes();
+        frames++;
+        animationId = requestAnimationFrame(draw);
+      }
+
+      function returnToMenu() {
+        gameRunning = false; // Arrêter le jeu
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
+        // Rediriger vers le menu
+        window.location.href = "menu.html?fromGame=true";
+      }
+
+      document.onkeydown = (e) => {
+        if (e.code === "Space") {
+          if (gameOver) {
+            startGame();
+          } else {
+            bird.jump();
+          }
+        }
+        if (e.code === "KeyH") {
+          // Basculer l'affichage de la hitbox
+          const currentHitboxState = localStorage.getItem("showHitbox") === "true";
+          const newHitboxState = !currentHitboxState;
+          localStorage.setItem("showHitbox", newHitboxState);
+          // Redémarrer le jeu pour appliquer le changement
+          if (gameRunning) {
+            startGame();
+          }
+        }
+      };
+
+      // Gestion du clic sur le bouton menu
+      canvas.addEventListener("click", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Vérifier si le clic est sur le bouton menu
+        if (x >= canvas.width - 120 && x <= canvas.width - 10 && 
+            y >= 10 && y <= 40) {
+          returnToMenu();
+        }
+      });
+
+      draw();
+    }
+
+    // 🔹 Démarrer le jeu automatiquement
+    startGame();
+  </script>
+</body>
+</html>
