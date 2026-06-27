@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Défis - Flappy Emoji 🎯</title>
+  <style>
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: "Segoe UI Emoji", Arial, sans-serif;
+      overflow: hidden;
+      user-select: none;
+    }
+    #game {
+      display: block;
+      margin: 0 auto;
+      background: #87CEEB;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+  </style>
+  </head>
+  <body>
+    <canvas id="game" width="400" height="600"></canvas>
+
+    <script>
+      const canvas = document.getElementById("game");
+      const ctx = canvas.getContext("2d");
+
+      let gameRunning = false;
+      let animationId = null;
+
+      // Skins sélectionnés
+      const selectedEmoji = localStorage.getItem("selectedEmoji") || "😁";
+
+      // Utilitaires
+      function distance(x1, y1, x2, y2) {
+        const dx = x1 - x2, dy = y1 - y2;
+        return Math.hypot(dx, dy);
+      }
+
+      function startGame() {
+        gameRunning = true;
+        let frames = 0;
+        const gravity = 0.25;
+        const jump = 4.6;
+
+        // Bonus actifs (filtrer expirés)
+        let activeBonuses = JSON.parse(localStorage.getItem("activeBonuses") || "[]");
+        const ownedBonusesExpiry = JSON.parse(localStorage.getItem("ownedBonusesExpiry") || "{}");
+        const nowTs = Date.now();
+        activeBonuses = activeBonuses.filter(id => (ownedBonusesExpiry[id] || 0) > nowTs);
+
+        // Points de départ
+        const startPointsBonuses = [
+          { id: "start_10", points: 10 },
+          { id: "start_20", points: 20 },
+          { id: "start_30", points: 30 },
+          { id: "start_50", points: 50 }
+        ];
+        let startBonus = 0;
+        activeBonuses.forEach(id => {
+          const b = startPointsBonuses.find(x => x.id === id);
+          if (b) startBonus = Math.max(startBonus, b.points);
+        });
+
+        // Vies supplémentaires
+        const extraLivesBonuses = [ { id: "life_1", lives: 1 }, { id: "life_2", lives: 2 } ];
+        let extraLives = 0;
+        activeBonuses.forEach(id => {
+          const b = extraLivesBonuses.find(x => x.id === id);
+          if (b) extraLives = Math.max(extraLives, b.lives);
+        });
+
+        let score = startBonus;
+        let lives = 1 + extraLives;
+        let gameOver = false;
+
+        // Obstacles en piques (triangles)
+        const spikes = [];
+
+        const bird = {
+          x: 60,
+          y: 150,
+          size: 36,
+          velocity: 0,
+          jump() { this.velocity = -jump; },
+          update() {
+            this.velocity += gravity;
+            this.y += this.velocity;
+
+            // Sol
+            if (this.y + this.size > canvas.height - 40) {
+              this.y = canvas.height - 40 - this.size;
+              if (lives > 1) {
+                lives--; this.y = canvas.height / 2; this.velocity = 0;
+              } else { gameOver = true; }
+            }
+            // Plafond
+            if (this.y < 0) {
+              this.y = 0;
+              if (lives > 1) { lives--; this.y = canvas.height / 2; this.velocity = 0; }
+              else { this.velocity = 0; }
+            }
+          },
+          getHitBox() {
+            const centerX = this.x + this.size * 0.67;
+            const centerY = this.y - this.size * 0.35;
+            const radius = this.size * 0.35;
+            return { x: centerX, y: centerY, radius };
+          },
+          draw() {
+            ctx.font = `${this.size}px "Segoe UI Emoji"`;
+            ctx.fillText(selectedEmoji, this.x, this.y);
+          }
+        };
+
+        function addSpike() {
+          // Pique orientée vers le haut (depuis le bas) ou vers le bas (depuis le haut)
+          const up = Math.random() < 0.5;
+          const base = 70; // largeur à la base
+          const height = 130; // hauteur du triangle
+          const centerY = up ? canvas.height - 40 : 0; // base au sol ou au plafond
+          // décalage vertical pour ne pas rendre impossible
+          const x = canvas.width + 60;
+          spikes.push({ x, up, base, height, passed: false });
+        }
+
+        function pointInTriangle(px, py, ax, ay, bx, by, cx, cy) {
+          // barycentric technique
+          const v0x = cx - ax, v0y = cy - ay;
+          const v1x = bx - ax, v1y = by - ay;
+          const v2x = px - ax, v2y = py - ay;
+          const dot00 = v0x*v0x + v0y*v0y;
+          const dot01 = v0x*v1x + v0y*v1y;
+          const dot02 = v0x*v2x + v0y*v2y;
+          const dot11 = v1x*v1x + v1y*v1y;
+          const dot12 = v1x*v2x + v1y*v2y;
+          const invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+          const u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+          const v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+          return (u >= 0) && (v >= 0) && (u + v <= 1);
+        }
+
+        function updateSpikes() {
+          for (let i = 0; i < spikes.length; i++) {
+            const s = spikes[i];
+            s.x -= 2;
+
+            // Collision: centre de l'oiseau dans le triangle (approximation)
+            const hit = bird.getHitBox();
+            const half = s.base / 2;
+            if (s.up) {
+              // triangle avec sommet en haut et base sur le sol
+              const ax = s.x - half, ay = canvas.height - 40; // base gauche
+              const bx = s.x + half, by = canvas.height - 40; // base droite
+              const cx = s.x, cy = canvas.height - 40 - s.height; // sommet
+              const inside = pointInTriangle(hit.x, hit.y, ax, ay, bx, by, cx, cy);
+              if (inside) {
+                if (lives > 1) { lives--; bird.y = canvas.height / 2; bird.velocity = 0; spikes.splice(i,1); i--; continue; }
+                else { gameOver = true; }
+              }
+            } else {
+              // triangle avec sommet en bas et base au plafond
+              const ax = s.x - half, ay = 0; // base gauche
+              const bx = s.x + half, by = 0; // base droite
+              const cx = s.x, cy = s.height; // sommet vers le bas
+              const inside = pointInTriangle(hit.x, hit.y, ax, ay, bx, by, cx, cy);
+              if (inside) {
+                if (lives > 1) { lives--; bird.y = canvas.height / 2; bird.velocity = 0; spikes.splice(i,1); i--; continue; }
+                else { gameOver = true; }
+              }
+            }
+
+            // Score quand le centre de la pique a passé l'oiseau
+            if (!s.passed && s.x + (s.base/2) < bird.x) {
+              s.passed = true;
+              score++;
+              if (score % 30 === 0) {
+                let diamonds = parseInt(localStorage.getItem("diamonds") || "0");
+                diamonds++;
+                localStorage.setItem("diamonds", diamonds.toString());
+              }
+            }
+          }
+
+          if (spikes.length && spikes[0].x + (spikes[0].base/2) < -10) spikes.shift();
+          if (frames % 95 === 0) addSpike();
+        }
+
+        function drawSpikes() {
+          spikes.forEach(s => {
+            const half = s.base / 2;
+            ctx.beginPath();
+            if (s.up) {
+              ctx.moveTo(s.x - half, canvas.height - 40);
+              ctx.lineTo(s.x + half, canvas.height - 40);
+              ctx.lineTo(s.x, canvas.height - 40 - s.height);
+            } else {
+              ctx.moveTo(s.x - half, 0);
+              ctx.lineTo(s.x + half, 0);
+              ctx.lineTo(s.x, s.height);
+            }
+            ctx.closePath();
+            ctx.fillStyle = "#8B0000";
+            ctx.fill();
+            ctx.strokeStyle = "#FFD700";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          });
+        }
+
+        function drawGround() {
+          ctx.fillStyle = "#ded892";
+          ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+        }
+
+        function drawHUD() {
+          const boxHeight = lives > 1 ? 95 : 80;
+          ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+          ctx.fillRect(5, 5, 200, boxHeight);
+
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(5, 5, 200, boxHeight);
+
+          ctx.fillStyle = "#00ff00";
+          ctx.font = "bold 24px Arial";
+          ctx.fillText(`Score : ${score}`, 15, 30);
+
+          const bestKey = "bestScoreDefis";
+          let best = parseInt(localStorage.getItem(bestKey) || "0");
+          best = Math.max(best, score);
+          ctx.fillStyle = "#ffd700";
+          ctx.font = "bold 20px Arial";
+          ctx.fillText(`Meilleur : ${best}`, 15, 55);
+
+          if (lives > 1) {
+            ctx.fillStyle = "#ff6b6b";
+            ctx.font = "bold 18px Arial";
+            let livesText = "❤️ ";
+            for (let i = 0; i < lives; i++) livesText += "❤️";
+            ctx.fillText(livesText, 15, 75);
+          }
+
+          const diamonds = parseInt(localStorage.getItem("diamonds") || "0");
+          ctx.fillStyle = "#1976d2";
+          ctx.font = "bold 18px Arial";
+          ctx.fillText(`💎 ${diamonds}`, 15, lives > 1 ? 95 : 80);
+
+          // Bouton Menu
+          const gradient = ctx.createLinearGradient(canvas.width - 130, 10, canvas.width - 10, 45);
+          gradient.addColorStop(0, "#4CAF50");
+          gradient.addColorStop(1, "#2E7D32");
+          ctx.fillStyle = gradient;
+          ctx.fillRect(canvas.width - 130, 10, 120, 35);
+          ctx.strokeStyle = "rgba(0, 0, 0, 0.3)";
+          ctx.lineWidth = 2;
+          ctx.strokeRect(canvas.width - 130, 10, 120, 35);
+          ctx.fillStyle = "white";
+          ctx.font = "bold 16px Arial";
+          ctx.fillText("🏠 Menu", canvas.width - 120, 32);
+        }
+
+        function draw() {
+          if (!gameRunning) return;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // fond (ciel déjà bleu)
+          drawGround();
+          drawSpikes();
+          drawHUD();
+          bird.draw();
+
+          if (gameOver) {
+            const bestKey = "bestScoreDefis";
+            let best = parseInt(localStorage.getItem(bestKey) || "0");
+            if (score > best) localStorage.setItem(bestKey, score);
+
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.font = "36px Arial";
+            ctx.fillText("Game Over 😵", 90, 280);
+            ctx.font = "20px Arial";
+            ctx.fillText(`Score final : ${score}`, 140, 320);
+            ctx.fillText("Appuie sur ESPACE pour rejouer", 70, 360);
+            ctx.fillText("Clique sur le bouton Menu pour revenir", 50, 390);
+            return;
+          }
+
+          bird.update();
+          updateSpikes();
+          frames++;
+          animationId = requestAnimationFrame(draw);
+        }
+
+        document.onkeydown = (e) => {
+          if (e.code === "Space") {
+            e.preventDefault();
+            if (gameOver) startGame(); else bird.jump();
+          }
+        };
+
+        canvas.addEventListener("click", (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          if (x >= canvas.width - 130 && x <= canvas.width - 10 && y >= 10 && y <= 45) {
+            gameRunning = false;
+            if (animationId) cancelAnimationFrame(animationId);
+            window.location.href = "menu.html?fromGame=true";
+          } else {
+            bird.jump();
+          }
+        });
+
+        addSpike();
+        draw();
+      }
+
+      startGame();
+    </script>
+  </body>
+</html>
+
+

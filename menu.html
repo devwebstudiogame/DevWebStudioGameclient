@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menu - Flappy Emoji 🐣</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: "Segoe UI Emoji", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    #menu {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      width: 100%;
+      padding: 40px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #ff6b6b, #4ec0ca);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .subtitle {
+      color: #666;
+      font-size: 1.1em;
+      margin-bottom: 30px;
+    }
+    
+    .section {
+      margin: 25px 0;
+      padding: 25px;
+      background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+      border-radius: 20px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    
+    .section h3 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+      font-size: 1.4em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    #emojis {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .emoji-btn {
+      font-size: 50px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: 3px solid transparent;
+    }
+    
+    .emoji-btn:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 1);
+    }
+    
+    .emoji-btn.locked {
+      opacity: 0.3;
+      filter: grayscale(100%);
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .emoji-btn.selected {
+      border-color: #ff6b6b;
+      background: rgba(255, 107, 107, 0.1);
+      transform: scale(1.05);
+    }
+    
+    .pipe-skin-btn, .background-skin-btn, .ground-skin-btn {
+      display: inline-block;
+      margin: 8px;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .pipe-skin-btn {
+      width: 70px;
+      height: 45px;
+    }
+    
+    .background-skin-btn {
+      width: 90px;
+      height: 60px;
+    }
+    
+    .ground-skin-btn {
+      width: 80px;
+      height: 50px;
+    }
+    
+    .pipe-skin-btn:hover, .background-skin-btn:hover, .ground-skin-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .pipe-skin-btn.locked, .background-skin-btn.locked, .ground-skin-btn.locked {
+      opacity: 0.3;
+      filter: grayscale(100%);
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .pipe-skin-btn.selected, .background-skin-btn.selected, .ground-skin-btn.selected {
+      border: 3px solid #ff6b6b;
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+    }
+    
+    .selection-info {
+      background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+      padding: 15px;
+      border-radius: 15px;
+      margin-top: 15px;
+      font-size: 1.1em;
+      font-weight: 600;
+      color: #1565c0;
+      border: 2px solid #2196f3;
+    }
+    
+    #startBtn {
+      background: linear-gradient(45deg, #ff6b6b, #4ec0ca);
+      color: white;
+      border: none;
+      padding: 18px 40px;
+      font-size: 1.3em;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 30px 0;
+    }
+    
+    #startBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(45deg, #ff5252, #26c6da);
+    }
+    
+    .shop-btn {
+      background: linear-gradient(45deg, #FFD700, #FFA500);
+      color: #333;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1em;
+      font-weight: 600;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(255, 215, 0, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .shop-btn::before {
+      content: "✨";
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      font-size: 14px;
+      animation: sparkle 2s infinite;
+    }
+    
+    .shop-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(255, 215, 0, 0.4);
+      background: linear-gradient(45deg, #FFA500, #FFD700);
+    }
+    
+    .quest-btn {
+      background: linear-gradient(45deg, #9E9E9E, #757575);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1em;
+      font-weight: 600;
+      border-radius: 20px;
+      cursor: not-allowed;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(158, 158, 158, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.7;
+      position: relative;
+    }
+    
+    .quest-btn::after {
+      content: "🚧";
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      font-size: 0.8em;
+      background: #FF5722;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .quest-btn:hover {
+      transform: none;
+      box-shadow: 0 4px 8px rgba(158, 158, 158, 0.3);
+      background: linear-gradient(45deg, #757575, #9E9E9E);
+      opacity: 0.8;
+    }
+    
+    .pass-btn {
+      background: linear-gradient(45deg, #9C27B0, #7B1FA2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1em;
+      font-weight: 600;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(156, 39, 176, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .pass-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(156, 39, 176, 0.4);
+      background: linear-gradient(45deg, #7B1FA2, #9C27B0);
+    }
+    
+    
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.2); }
+    }
+    
+    /* 🎨 POPUP MODERNE */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .popup {
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      transform: scale(0.7) translateY(50px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .popup-overlay.show .popup {
+      transform: scale(1) translateY(0);
+    }
+    
+    .popup::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #4CAF50, #2196F3, #FF9800, #E91E63);
+    }
+    
+    .popup-icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+      animation: bounce 0.6s ease;
+    }
+    
+    .popup-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    
+    .popup-message {
+      font-size: 1.1em;
+      color: #666;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+    
+    .popup-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+    
+    .popup-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+    
+    .popup-btn-primary {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      color: white;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .popup-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+    
+    .popup-btn-secondary {
+      background: linear-gradient(45deg, #9E9E9E, #757575);
+      color: white;
+      box-shadow: 0 4px 15px rgba(158, 158, 158, 0.3);
+    }
+    
+    .popup-btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(158, 158, 158, 0.4);
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+    
+    .score-info {
+      background: linear-gradient(145deg, #fff3e0, #ffe0b2);
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 20px;
+      border: 2px solid #ff9800;
+    }
+    
+    .score-info h4 {
+      color: #e65100;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    
+    .score-display {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #ff6b6b;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    .skin-label {
+      position: absolute;
+      bottom: 2px;
+      left: 2px;
+      right: 2px;
+      font-size: 10px;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      text-align: center;
+      font-weight: bold;
+      z-index: 2;
+    }
+    
+    .pipe-skin-btn .skin-label {
+      font-size: 9px;
+    }
+    
+    .background-skin-btn .skin-label {
+      font-size: 10px;
+    }
+    
+    /* Menu développeur */
+    #devMenu {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      border: 2px solid #ff6b6b;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: none;
+      text-align: center;
+      min-width: 300px;
+    }
+    
+    #devMenu h3 {
+      color: #ff6b6b;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+    
+    #devMenu input {
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      background: #222;
+      color: white;
+      font-size: 16px;
+      width: 200px;
+    }
+    
+    #devMenu button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #ff6b6b;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    #devMenu button:hover {
+      background: #ff5252;
+    }
+    
+    #devMenu .dev-options {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    
+    #devMenu .dev-options label {
+      display: block;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    
+    #devMenu .dev-options input[type="checkbox"] {
+      width: auto;
+      margin-right: 10px;
+    }
+    
+    .dev-toggle {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      color: rgba(255, 255, 255, 0.3);
+      border: none;
+      padding: 4px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 10px;
+      z-index: 999;
+      transition: all 0.3s ease;
+      opacity: 0.1;
+    }
+    
+    .dev-toggle:hover {
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      #menu {
+        padding: 20px;
+        margin: 10px;
+      }
+      
+      h1 {
+        font-size: 2.5em;
+      }
+      
+      .section {
+        padding: 20px;
+      }
+      
+      .emoji-btn {
+        font-size: 40px;
+        padding: 10px;
+      }
+      
+      .pipe-skin-btn {
+        width: 60px;
+        height: 40px;
+      }
+      
+      .background-skin-btn {
+        width: 80px;
+        height: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 🏠 Menu principal / Casier -->
+  <div id="menu">
+    <h1>🐤 Flappy Emoji</h1>
+    <p class="subtitle">Personnalise ton expérience de jeu !</p>
+    
+    <div class="section">
+      <h3>🎭 Emojis</h3>
+      <div id="emojis"></div>
+      <div class="selection-info">
+        Emoji sélectionné : <span id="currentEmoji">😁</span>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h3>🔧 Tuyaux</h3>
+      <div id="pipeSkins"></div>
+      <div class="selection-info">
+        Tuyaux sélectionnés : <span id="currentPipeSkin">Classique</span>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h3>🌅 Arrière-plans</h3>
+      <div id="backgroundSkins"></div>
+      <div class="selection-info">
+        Arrière-plan sélectionné : <span id="currentBackgroundSkin">Ciel</span>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h3>🌱 Sols</h3>
+      <div id="groundSkins"></div>
+      <div class="selection-info">
+        Sol sélectionné : <span id="currentGroundSkin">Herbe</span>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 15px; justify-content: center; margin: 20px 0; flex-wrap: wrap;">
+      <button id="startBtn">🎮 Jouer</button>
+      <button id="shopBtn" class="shop-btn">🛒 Boutique Premium</button>
+      <button id="bonusBtn" class="shop-btn" style="background: linear-gradient(45deg, #FF9800, #FF5722);">🎁 Boutique Bonus</button>
+      <button id="questBtn" class="quest-btn">📋 Quêtes</button>
+      <button id="passBtn" class="pass-btn">🎯 Pass Emoji</button>
+    </div>
+    
+    <div class="score-info">
+      <h4>🏆 Ton Score Maximum</h4>
+      <div class="score-display" id="bestScoreDisplay">0</div>
+      <p style="margin-top: 10px; color: #666; font-size: 0.9em;">
+        Les emojis, tuyaux et arrière-plans se débloquent avec ton score max.
+      </p>
+    </div>
+    
+    <div class="score-info" id="leagueInfo">
+      <h4>🏅 Ta Ligue</h4>
+      <div class="score-display" id="leagueDisplay">Pas encore en ligue</div>
+      <p style="margin-top: 10px; color: #666; font-size: 0.9em;">
+        Atteins 100 points pour entrer en Ligue 1. Une ligue tous les 100 points, jusqu'à la Ligue 20 (2000).
+      </p>
+      <div id="leagueProgress" style="margin-top:8px; height:8px; background: rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden;">
+        <div id="leagueProgressFill" style="height:100%; width:0%; background: linear-gradient(90deg, #ff6b6b, #4ec0ca);"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Bouton développeur caché -->
+  <button class="dev-toggle" id="devToggle" title="Dev">•</button>
+  
+  <!-- 🔧 Menu développeur -->
+  <div id="devMenu">
+    <h3>🔧 Menu Développeur</h3>
+    <p>Entrez le mot de passe :</p>
+    <input type="password" id="devPassword" placeholder="Mot de passe">
+    <br>
+    <button id="devLogin">Se connecter</button>
+    <button id="devClose">Fermer</button>
+    
+    <div class="dev-options" id="devOptions" style="display: none;">
+      <h4>Options de développement :</h4>
+      <label>
+        <input type="checkbox" id="hitboxToggle" checked>
+        Afficher la box de collision dans le jeu
+      </label>
+      <br>
+      <button id="resetGame">🔄 Réinitialiser le jeu</button>
+      <br>
+      <button id="devApply">Appliquer</button>
+    </div>
+  </div>
+
+  <script>
+    // 🎨 FONCTIONS POPUP MODERNE
+    function showPopup(icon, title, message, buttons = []) {
+      // Créer l'overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'popup-overlay';
+      
+      // Créer le popup
+      const popup = document.createElement('div');
+      popup.className = 'popup';
+      
+      popup.innerHTML = `
+        <div class="popup-icon">${icon}</div>
+        <div class="popup-title">${title}</div>
+        <div class="popup-message">${message}</div>
+        <div class="popup-buttons">
+          ${buttons.map(btn => 
+            `<button class="popup-btn ${btn.class || 'popup-btn-primary'}" onclick="${btn.action}">${btn.text}</button>`
+          ).join('')}
+        </div>
+      `;
+      
+      overlay.appendChild(popup);
+      document.body.appendChild(overlay);
+      
+      // Animation d'apparition
+      setTimeout(() => overlay.classList.add('show'), 10);
+      
+      // Fermer en cliquant sur l'overlay
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          closePopup(overlay);
+        }
+      });
+      
+      return overlay;
+    }
+    
+    function closePopup(overlay) {
+      overlay.classList.remove('show');
+      setTimeout(() => {
+        if (overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
+        }
+      }, 300);
+    }
+    
+    // 🔹 Liste des emojis à débloquer
+    let emojiList = [
+      { emoji: "😁", minScore: 0, isShop: false },
+      { emoji: "😅", minScore: 50, isShop: false },
+      { emoji: "🤣", minScore: 100, isShop: false },
+      { emoji: "😂", minScore: 150, isShop: false },
+      { emoji: "🙂", minScore: 200, isShop: false },
+      { emoji: "🙃", minScore: 250, isShop: false },
+      { emoji: "🫠", minScore: 300, isShop: false },
+      { emoji: "😉", minScore: 350, isShop: false },
+      { emoji: "🥰", minScore: 400, isShop: false },
+      { emoji: "😍", minScore: 450, isShop: false },
+      { emoji: "🤩", minScore: 500, isShop: false },
+      { emoji: "😘", minScore: 550, isShop: false },
+      { emoji: "☺️", minScore: 600, isShop: false },
+      { emoji: "🥲", minScore: 650, isShop: false },
+      { emoji: "😛", minScore: 700, isShop: false },
+      { emoji: "😜", minScore: 750, isShop: false },
+      { emoji: "🤗", minScore: 800, isShop: false },
+      { emoji: "🤭", minScore: 850, isShop: false },
+      { emoji: "🤫", minScore: 900, isShop: false },
+      { emoji: "🤔", minScore: 950, isShop: false },
+      { emoji: "🫡", minScore: 1000, isShop: false },
+      { emoji: "😒", minScore: 1050, isShop: false },
+      { emoji: "🙄", minScore: 1100, isShop: false },
+      { emoji: "🙂‍↔️", minScore: 1150, isShop: false },
+      { emoji: "🙂‍↕️", minScore: 1200, isShop: false },
+      { emoji: "🥵", minScore: 1250, isShop: false },
+      { emoji: "🤯", minScore: 1300, isShop: false },
+      { emoji: "🥳", minScore: 1350, isShop: false },
+      { emoji: "😎", minScore: 1400, isShop: false },
+      { emoji: "🤓", minScore: 1450, isShop: false },
+      { emoji: "😮", minScore: 1500, isShop: false },
+      { emoji: "🥺", minScore: 1550, isShop: false },
+      { emoji: "🥹", minScore: 1600, isShop: false },
+      { emoji: "😥", minScore: 1650, isShop: false },
+      { emoji: "😢", minScore: 1700, isShop: false },
+      { emoji: "😭", minScore: 1750, isShop: false },
+      { emoji: "😱", minScore: 1800, isShop: false },
+      { emoji: "😡", minScore: 1850, isShop: false },
+      { emoji: "😠", minScore: 1900, isShop: false },
+      { emoji: "💩", minScore: 1950, isShop: false },
+      // Emojis de la boutique
+      { emoji: "👑", minScore: 0, isShop: true, shopId: "emoji_0" },
+      { emoji: "💎", minScore: 0, isShop: true, shopId: "emoji_1" },
+      { emoji: "🔥", minScore: 0, isShop: true, shopId: "emoji_2" },
+      { emoji: "⚡", minScore: 0, isShop: true, shopId: "emoji_3" },
+      { emoji: "🌟", minScore: 0, isShop: true, shopId: "emoji_4" }
+    ];
+    
+    // Charger les emojis du Pass Emoji depuis le localStorage
+    function loadPassEmojis() {
+      const savedEmojis = JSON.parse(localStorage.getItem("emojiList") || "[]");
+      const passEmojis = savedEmojis.filter(emoji => emoji.isPassEmoji);
+      
+      // Ajouter les emojis du Pass Emoji à la liste principale
+      passEmojis.forEach(passEmoji => {
+        const exists = emojiList.some(emoji => emoji.emoji === passEmoji.emoji);
+        if (!exists) {
+          emojiList.push(passEmoji);
+        }
+      });
+    }
+    
+    // Charger les emojis du Pass Emoji au démarrage
+    loadPassEmojis();
+
+    // 🔹 Liste des skins de tuyaux à débloquer
+    const pipeSkinList = [
+      { name: "Classique", color: "#4CAF50", minScore: 0, isShop: false },
+      { name: "Métal", color: "#607D8B", minScore: 50, isShop: false },
+      { name: "Or", color: "#FFD700", minScore: 100, isShop: false },
+      { name: "Cristal", color: "#00BCD4", minScore: 150, isShop: false },
+      { name: "Lave", color: "#FF5722", minScore: 200, isShop: false },
+      { name: "Arc-en-ciel", color: "linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3)", minScore: 250, isShop: false },
+      // Tuyaux de la boutique
+      { name: "Cristal Prismatique", color: "linear-gradient(45deg, #ff0080, #00ff80, #8000ff, #ff8000)", minScore: 0, isShop: true, shopId: "pipe_0" },
+      { name: "Or Pur 24K", color: "linear-gradient(45deg, #FFD700, #FFA500, #FF8C00)", minScore: 0, isShop: true, shopId: "pipe_1" },
+      { name: "Diamant Noir", color: "linear-gradient(45deg, #000000, #1a1a1a, #333333)", minScore: 0, isShop: true, shopId: "pipe_2" },
+      { name: "Plasma Quantique", color: "linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ff00)", minScore: 0, isShop: true, shopId: "pipe_3" },
+      { name: "Matière Noire", color: "linear-gradient(45deg, #2c1810, #1a0e0a, #0d0603)", minScore: 0, isShop: true, shopId: "pipe_4" },
+      { name: "Énergie Cosmique", color: "linear-gradient(45deg, #ff6b6b, #4ec0ca, #45b7d1, #96ceb4)", minScore: 0, isShop: true, shopId: "pipe_5" }
+    ];
+
+    // 🔹 Liste des arrière-plans à débloquer
+    const backgroundSkinList = [
+      { name: "Ciel", type: "gradient", colors: ["#4ec0ca", "#ffffff"], minScore: 0, isShop: false },
+      { name: "Coucher", type: "gradient", colors: ["#ff7b7b", "#ff9a56", "#ffad56"], minScore: 50, isShop: false },
+      { name: "Nuit", type: "gradient", colors: ["#2c3e50", "#34495e", "#1a252f"], minScore: 100, isShop: false },
+      { name: "Aurore", type: "gradient", colors: ["#667eea", "#764ba2", "#f093fb"], minScore: 150, isShop: false },
+      { name: "Orage", type: "gradient", colors: ["#434343", "#000000", "#2c3e50"], minScore: 200, isShop: false },
+      { name: "Espace", type: "gradient", colors: ["#0c0c0c", "#1a1a2e", "#16213e"], minScore: 250, isShop: false },
+      { name: "Arc-en-ciel", type: "gradient", colors: ["#ff0000", "#ff7f00", "#ffff00", "#00ff00", "#0000ff", "#4b0082", "#9400d3"], minScore: 300, isShop: false },
+      // Arrière-plans de la boutique
+      { name: "Nébuleuse d'Orion", type: "gradient", colors: ["#0c0c0c", "#1a1a2e", "#16213e", "#0f3460", "#e94560"], minScore: 0, isShop: true, shopId: "bg_0" },
+      { name: "Trou Noir", type: "gradient", colors: ["#000000", "#1a1a1a", "#2d2d2d", "#000000"], minScore: 0, isShop: true, shopId: "bg_1" },
+      { name: "Big Bang", type: "gradient", colors: ["#ff0000", "#ff8000", "#ffff00", "#00ff00", "#0080ff", "#8000ff"], minScore: 0, isShop: true, shopId: "bg_2" },
+      { name: "Dimension Parallèle", type: "gradient", colors: ["#667eea", "#764ba2", "#f093fb", "#f5576c", "#4facfe"], minScore: 0, isShop: true, shopId: "bg_3" },
+      { name: "Univers Holographique", type: "gradient", colors: ["#ff00ff", "#00ffff", "#ffff00", "#ff0080", "#8000ff"], minScore: 0, isShop: true, shopId: "bg_4" },
+      { name: "Multivers Infini", type: "gradient", colors: ["#ff6b6b", "#4ec0ca", "#45b7d1", "#96ceb4", "#feca57", "#ff9ff3"], minScore: 0, isShop: true, shopId: "bg_5" }
+    ];
+
+    // 🔹 Liste des skins de sols à débloquer
+    const groundSkinList = [
+      { name: "Herbe", color: "#8BC34A", minScore: 0, isShop: false },
+      { name: "Sable", color: "#FFC107", minScore: 50, isShop: false },
+      { name: "Neige", color: "#E1F5FE", minScore: 100, isShop: false },
+      { name: "Lave", color: "#FF5722", minScore: 150, isShop: false },
+      { name: "Glace", color: "#81D4FA", minScore: 200, isShop: false },
+      { name: "Cristal", color: "#E1BEE7", minScore: 250, isShop: false },
+      { name: "Métal", color: "#607D8B", minScore: 300, isShop: false },
+      // Sols de la boutique
+      { name: "Or Pur", color: "linear-gradient(45deg, #FFD700, #FFA500)", minScore: 0, isShop: true, shopId: "ground_0" },
+      { name: "Diamant", color: "linear-gradient(45deg, #E1F5FE, #B3E5FC, #81D4FA)", minScore: 0, isShop: true, shopId: "ground_1" },
+      { name: "Néon", color: "linear-gradient(45deg, #00E676, #00BCD4, #3F51B5)", minScore: 0, isShop: true, shopId: "ground_2" },
+      { name: "Plasma", color: "linear-gradient(45deg, #FF4081, #E91E63, #9C27B0)", minScore: 0, isShop: true, shopId: "ground_3" },
+      { name: "Cosmos", color: "linear-gradient(45deg, #1A1A2E, #16213E, #0F3460)", minScore: 0, isShop: true, shopId: "ground_4" },
+      { name: "Holographique", color: "linear-gradient(45deg, #FF00FF, #00FFFF, #FFFF00)", minScore: 0, isShop: true, shopId: "ground_5" }
+    ];
+
+    // 🔹 Charger le score max depuis le navigateur
+    let bestScore = parseInt(localStorage.getItem("bestScore") || "0");
+    let selectedEmoji = localStorage.getItem("selectedEmoji") || "😁";
+    let selectedPipeSkin = parseInt(localStorage.getItem("selectedPipeSkin") || "0");
+    let selectedBackgroundSkin = parseInt(localStorage.getItem("selectedBackgroundSkin") || "0");
+    let selectedGroundSkin = parseInt(localStorage.getItem("selectedGroundSkin") || "0");
+    
+    // 🔹 Fonction pour vérifier si un skin de boutique est possédé
+    function isShopItemOwned(shopId) {
+      const ownedItems = JSON.parse(localStorage.getItem("ownedItems") || "[]");
+      return ownedItems.includes(shopId);
+    }
+    
+    // 🔹 Fonction pour vérifier si un skin est débloqué (score ou boutique)
+    function isSkinUnlocked(item) {
+      if (item.isShop) {
+        return isShopItemOwned(item.shopId);
+      } else {
+        return bestScore >= item.minScore;
+      }
+    }
+
+    // 🔹 Éléments DOM
+    const emojisDiv = document.getElementById("emojis");
+    const currentEmojiSpan = document.getElementById("currentEmoji");
+    const pipeSkinsDiv = document.getElementById("pipeSkins");
+    const currentPipeSkinSpan = document.getElementById("currentPipeSkin");
+    const backgroundSkinsDiv = document.getElementById("backgroundSkins");
+    const currentBackgroundSkinSpan = document.getElementById("currentBackgroundSkin");
+    const groundSkinsDiv = document.getElementById("groundSkins");
+    const currentGroundSkinSpan = document.getElementById("currentGroundSkin");
+    const bestScoreDisplay = document.getElementById("bestScoreDisplay");
+    const startBtn = document.getElementById("startBtn");
+    
+    // 🔹 Ligue - calcul et mise à jour de l'UI
+    function getLeagueFromScore(score) {
+      const league = Math.floor(score / 100);
+      return Math.max(0, Math.min(20, league));
+    }
+    
+    function updateLeagueUI() {
+      const league = getLeagueFromScore(bestScore);
+      const leagueDisplay = document.getElementById("leagueDisplay");
+      const progressFill = document.getElementById("leagueProgressFill");
+      if (league === 0) {
+        leagueDisplay.textContent = "Pas encore en ligue";
+      } else {
+        leagueDisplay.textContent = `Ligue ${league}`;
+      }
+      // Progression jusqu'à la ligue suivante
+      const currentBase = league * 100;
+      const nextBase = league >= 20 ? 2000 : (league + 1) * 100;
+      const denom = Math.max(1, nextBase - currentBase);
+      const progressPct = league >= 20 ? 100 : Math.max(0, Math.min(100, ((bestScore - currentBase) / denom) * 100));
+      if (progressFill) progressFill.style.width = progressPct + "%";
+    }
+
+    // 🔹 Afficher les emojis dans le casier
+    function updateCasier() {
+      // Mettre à jour l'affichage du score
+      bestScoreDisplay.textContent = bestScore;
+      
+      emojisDiv.innerHTML = "";
+      emojiList.forEach((e, index) => {
+        const btn = document.createElement("span");
+        btn.textContent = e.emoji;
+        btn.classList.add("emoji-btn");
+        
+        const isUnlocked = isSkinUnlocked(e);
+        
+        // Ajouter l'indicateur de déverrouillage
+        const unlockLabel = document.createElement("div");
+        if (e.isShop) {
+          unlockLabel.textContent = isUnlocked ? "🛒" : "💰";
+          unlockLabel.style.color = isUnlocked ? "#4CAF50" : "#ff6b6b";
+        } else if (e.isPassEmoji) {
+          unlockLabel.textContent = isUnlocked ? "🎯" : "🔒";
+          unlockLabel.style.color = isUnlocked ? "#9C27B0" : "#ff6b6b";
+        } else {
+          unlockLabel.textContent = `${e.minScore}pts`;
+          unlockLabel.style.color = isUnlocked ? "#4CAF50" : "#ff6b6b";
+        }
+        unlockLabel.style.fontSize = "10px";
+        unlockLabel.style.fontWeight = "bold";
+        unlockLabel.style.marginTop = "2px";
+        
+        if (!isUnlocked) {
+          btn.classList.add("locked");
+        } else {
+          btn.addEventListener("click", () => {
+            // Retirer la sélection de tous les autres emojis
+            document.querySelectorAll('.emoji-btn').forEach(el => el.classList.remove('selected'));
+            
+            selectedEmoji = e.emoji;
+            currentEmojiSpan.textContent = selectedEmoji;
+            localStorage.setItem("selectedEmoji", selectedEmoji);
+            updateCasier(); // Rafraîchir pour mettre à jour la sélection
+          });
+        }
+        
+        // Sélection uniquement si c'est l'emoji actuellement sélectionné
+        if (isUnlocked && selectedEmoji === e.emoji) {
+          btn.classList.add("selected");
+        }
+        
+        btn.appendChild(unlockLabel);
+        emojisDiv.appendChild(btn);
+      });
+
+      // Afficher les skins de tuyaux
+      pipeSkinsDiv.innerHTML = "";
+      pipeSkinList.forEach((skin, index) => {
+        const btn = document.createElement("div");
+        btn.classList.add("pipe-skin-btn");
+        
+        const isUnlocked = isSkinUnlocked(skin);
+        
+        // Sélection uniquement si c'est le skin actuellement sélectionné
+        if (isUnlocked && selectedPipeSkin === index) {
+          btn.classList.add("selected");
+        }
+        
+        if (!isUnlocked) {
+          btn.classList.add("locked");
+        } else {
+          btn.addEventListener("click", () => {
+            // Retirer la sélection de tous les autres tuyaux
+            document.querySelectorAll('.pipe-skin-btn').forEach(el => el.classList.remove('selected'));
+            
+            selectedPipeSkin = index;
+            currentPipeSkinSpan.textContent = skin.name;
+            localStorage.setItem("selectedPipeSkin", selectedPipeSkin);
+            updateCasier(); // Rafraîchir pour mettre à jour la sélection
+          });
+        }
+        
+        // Style du bouton selon le skin
+        if (skin.color.startsWith("linear-gradient")) {
+          btn.style.background = skin.color;
+        } else {
+          btn.style.backgroundColor = skin.color;
+        }
+        
+        // Ajouter un petit texte pour identifier le skin
+        const label = document.createElement("div");
+        label.textContent = skin.name;
+        label.classList.add("skin-label");
+        btn.appendChild(label);
+        
+        // Ajouter l'indicateur de déverrouillage
+        const unlockLabel = document.createElement("div");
+        if (skin.isShop) {
+          unlockLabel.textContent = isUnlocked ? "🛒" : "💰";
+          unlockLabel.style.color = isUnlocked ? "#4CAF50" : "#ff6b6b";
+        } else {
+          unlockLabel.textContent = `${skin.minScore}pts`;
+          unlockLabel.style.color = isUnlocked ? "#4CAF50" : "#ff6b6b";
+        }
+        unlockLabel.style.fontSize = "8px";
+        unlockLabel.style.fontWeight = "bold";
+        unlockLabel.style.position = "absolute";
+        unlockLabel.style.top = "2px";
+        unlockLabel.style.right = "2px";
+        unlockLabel.style.background = "rgba(0,0,0,0.7)";
+        unlockLabel.style.padding = "1px 3px";
+        unlockLabel.style.borderRadius = "3px";
+        btn.appendChild(unlockLabel);
+        
+        pipeSkinsDiv.appendChild(btn);
+      });
+
+      // Afficher les arrière-plans
+      backgroundSkinsDiv.innerHTML = "";
+      backgroundSkinList.forEach((bg, index) => {
+        const btn = document.createElement("div");
+        btn.classList.add("background-skin-btn");
+        
+        const isUnlocked = isSkinUnlocked(bg);
+        
+        // Sélection uniquement si c'est l'arrière-plan actuellement sélectionné
+        if (isUnlocked && selectedBackgroundSkin === index) {
+          btn.classList.add("selected");
+        }
+        
+        if (!isUnlocked) {
+          btn.classList.add("locked");
+        } else {
+          btn.addEventListener("click", () => {
+            // Retirer la sélection de tous les autres arrière-plans
+            document.querySelectorAll('.background-skin-btn').forEach(el => el.classList.remove('selected'));
+            
+            selectedBackgroundSkin = index;
+            currentBackgroundSkinSpan.textContent = bg.name;
+            localStorage.setItem("selectedBackgroundSkin", selectedBackgroundSkin);
+            updateCasier(); // Rafraîchir pour mettre à jour la sélection
+          });
+        }
+        
+        // Créer un aperçu du dégradé
+        const gradient = document.createElement("div");
+        gradient.style.width = "100%";
+        gradient.style.height = "100%";
+        gradient.style.background = `linear-gradient(to bottom, ${bg.colors.join(", ")})`;
+        gradient.style.borderRadius = "6px";
+        btn.appendChild(gradient);
+        
+        // Ajouter le nom de l'arrière-plan
+        const label = document.createElement("div");
+        label.textContent = bg.name;
+        label.classList.add("skin-label");
+        btn.appendChild(label);
+        
+        // Ajouter l'indicateur de déverrouillage
+        const unlockLabel = document.createElement("div");
+        if (bg.isShop) {
+          unlockLabel.textContent = isUnlocked ? "🛒" : "💰";
+          unlockLabel.style.color = isUnlocked ? "#4CAF50" : "#ff6b6b";
+        } else {
+          unlockLabel.textContent = `${bg.minScore}pts`;
+          unlockLabel.style.color = isUnlocked ? "#4CAF50" : "#ff6b6b";
+        }
+        unlockLabel.style.fontSize = "9px";
+        unlockLabel.style.fontWeight = "bold";
+        unlockLabel.style.position = "absolute";
+        unlockLabel.style.top = "2px";
+        unlockLabel.style.right = "2px";
+        unlockLabel.style.background = "rgba(0,0,0,0.7)";
+        unlockLabel.style.padding = "1px 3px";
+        unlockLabel.style.borderRadius = "3px";
+        btn.appendChild(unlockLabel);
+        
+        backgroundSkinsDiv.appendChild(btn);
+      });
+
+      // Afficher les skins de sols
+      groundSkinsDiv.innerHTML = "";
+      groundSkinList.forEach((ground, index) => {
+        const btn = document.createElement("div");
+        btn.classList.add("ground-skin-btn");
+        
+        const isUnlocked = isSkinUnlocked(ground);
+        
+        // Sélection uniquement si c'est le sol actuellement sélectionné
+        if (isUnlocked && selectedGroundSkin === index) {
+          btn.classList.add("selected");
+        }
+        
+        if (!isUnlocked) {
+          btn.classList.add("locked");
+        } else {
+          btn.addEventListener("click", () => {
+            // Retirer la sélection de tous les autres sols
+            document.querySelectorAll('.ground-skin-btn').forEach(el => el.classList.remove('selected'));
+            
+            selectedGroundSkin = index;
+            currentGroundSkinSpan.textContent = ground.name;
+            localStorage.setItem("selectedGroundSkin", selectedGroundSkin);
+            updateCasier(); // Rafraîchir pour mettre à jour la sélection
+          });
+        }
+        
+        // Style du bouton selon le sol
+        if (ground.color.startsWith("linear-gradient")) {
+          btn.style.background = ground.color;
+        } else {
+          btn.style.backgroundColor = ground.color;
+        }
+        
+        // Ajouter un petit texte pour identifier le sol
+        const label = document.createElement("div");
+        label.textContent = ground.name;
+        label.classList.add("skin-label");
+        btn.appendChild(label);
+        
+        // Ajouter l'indicateur de déverrouillage
+        const unlockLabel = document.createElement("div");
+        if (ground.isShop) {
+          unlockLabel.textContent = isUnlocked ? "🛒" : "💰";
+          unlockLabel.style.color = isUnlocked ? "#4CAF50" : "#ff6b6b";
+        } else {
+          unlockLabel.textContent = `${ground.minScore}pts`;
+          unlockLabel.style.color = isUnlocked ? "#4CAF50" : "#ff6b6b";
+        }
+        unlockLabel.style.fontSize = "8px";
+        unlockLabel.style.fontWeight = "bold";
+        unlockLabel.style.position = "absolute";
+        unlockLabel.style.top = "2px";
+        unlockLabel.style.right = "2px";
+        unlockLabel.style.background = "rgba(0,0,0,0.7)";
+        unlockLabel.style.padding = "1px 3px";
+        unlockLabel.style.borderRadius = "3px";
+        btn.appendChild(unlockLabel);
+        
+        groundSkinsDiv.appendChild(btn);
+      });
+    }
+
+    // 🔹 Fonction pour démarrer le jeu
+    function startGame() {
+      // Sauvegarder les sélections dans localStorage
+      localStorage.setItem("selectedEmoji", selectedEmoji);
+      localStorage.setItem("selectedPipeSkin", selectedPipeSkin);
+      localStorage.setItem("selectedBackgroundSkin", selectedBackgroundSkin);
+      
+      // Rediriger vers le jeu
+      window.location.href = "interface.html";
+    }
+
+    // 🔹 Fonction pour revenir au menu depuis le jeu
+    function returnToMenu() {
+      // Charger les sélections depuis localStorage
+      selectedEmoji = localStorage.getItem("selectedEmoji") || "😁";
+      selectedPipeSkin = parseInt(localStorage.getItem("selectedPipeSkin") || "0");
+      selectedBackgroundSkin = parseInt(localStorage.getItem("selectedBackgroundSkin") || "0");
+      
+      // Mettre à jour l'affichage
+      currentEmojiSpan.textContent = selectedEmoji;
+      currentPipeSkinSpan.textContent = pipeSkinList[selectedPipeSkin].name;
+      currentBackgroundSkinSpan.textContent = backgroundSkinList[selectedBackgroundSkin].name;
+      
+      updateCasier();
+      updateLeagueUI();
+    }
+
+    // 🔹 Initialisation des sélections par défaut
+    function initializeDefaultSelections() {
+      // Si c'est la première fois, sélectionner les premiers skins débloqués
+      if (!localStorage.getItem("selectedEmoji")) {
+        const firstUnlockedEmoji = emojiList.find(e => isSkinUnlocked(e));
+        if (firstUnlockedEmoji) {
+          selectedEmoji = firstUnlockedEmoji.emoji;
+          localStorage.setItem("selectedEmoji", selectedEmoji);
+        }
+      }
+      if (!localStorage.getItem("selectedPipeSkin")) {
+        const firstUnlockedPipeIndex = pipeSkinList.findIndex(skin => isSkinUnlocked(skin));
+        if (firstUnlockedPipeIndex !== -1) {
+          selectedPipeSkin = firstUnlockedPipeIndex;
+          localStorage.setItem("selectedPipeSkin", selectedPipeSkin);
+        }
+      }
+      if (!localStorage.getItem("selectedBackgroundSkin")) {
+        const firstUnlockedBgIndex = backgroundSkinList.findIndex(bg => isSkinUnlocked(bg));
+        if (firstUnlockedBgIndex !== -1) {
+          selectedBackgroundSkin = firstUnlockedBgIndex;
+          localStorage.setItem("selectedBackgroundSkin", selectedBackgroundSkin);
+        }
+      }
+      if (!localStorage.getItem("selectedGroundSkin")) {
+        const firstUnlockedGroundIndex = groundSkinList.findIndex(ground => isSkinUnlocked(ground));
+        if (firstUnlockedGroundIndex !== -1) {
+          selectedGroundSkin = firstUnlockedGroundIndex;
+          localStorage.setItem("selectedGroundSkin", selectedGroundSkin);
+        }
+      }
+      
+      // Mettre à jour les affichages
+      currentEmojiSpan.textContent = selectedEmoji;
+      currentPipeSkinSpan.textContent = pipeSkinList[selectedPipeSkin].name;
+      currentBackgroundSkinSpan.textContent = backgroundSkinList[selectedBackgroundSkin].name;
+      currentGroundSkinSpan.textContent = groundSkinList[selectedGroundSkin].name;
+    }
+
+    // 🔹 Initialisation
+    initializeDefaultSelections();
+    updateCasier();
+    updateLeagueUI();
+    startBtn.addEventListener("click", startGame);
+    
+    // Bouton boutique
+    document.getElementById("shopBtn").addEventListener("click", () => {
+      window.location.href = "boutique.html";
+    });
+    
+    // Bouton boutique bonus
+    document.getElementById("bonusBtn").addEventListener("click", () => {
+      window.location.href = "bonus.html";
+    });
+    
+    // Bouton quêtes
+    document.getElementById("questBtn").addEventListener("click", () => {
+      // Popup de développement moderne
+      showPopup(
+        "🚧",
+        "Fonctionnalité en développement",
+        "Les quêtes seront bientôt disponibles !<br><br>Merci de votre patience.",
+        [{
+          text: "Compris",
+          action: "closePopup(this.closest('.popup-overlay'))"
+        }]
+      );
+    });
+    
+    // Bouton Pass Emoji
+    document.getElementById("passBtn").addEventListener("click", () => {
+      window.location.href = "passemoji.html";
+    });
+    
+    // Rafraîchir le casier quand on revient de la boutique ou du Pass Emoji
+    window.addEventListener("focus", () => {
+      // Recharger les emojis du Pass Emoji
+      loadPassEmojis();
+      updateCasier();
+      updateLeagueUI();
+    });
+    
+
+    // 🔹 Vérifier si on revient du jeu
+    if (window.location.search.includes("fromGame=true")) {
+      returnToMenu();
+    }
+
+    // 🔧 ---- MENU DÉVELOPPEUR ----
+    const devToggle = document.getElementById("devToggle");
+    const devMenu = document.getElementById("devMenu");
+    const devPassword = document.getElementById("devPassword");
+    const devLogin = document.getElementById("devLogin");
+    const devClose = document.getElementById("devClose");
+    const devOptions = document.getElementById("devOptions");
+    const hitboxToggle = document.getElementById("hitboxToggle");
+    const devApply = document.getElementById("devApply");
+    const resetGame = document.getElementById("resetGame");
+
+    // Fonction utilitaire pour la validation des données
+    function simpleHash(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convertir en 32bit
+      }
+      return hash.toString();
+    }
+
+    // Configuration de sécurité pour les paramètres utilisateur
+    const DEV_PASSWORD_HASH = simpleHash("2025");
+
+    // Ouvrir/fermer le menu développeur
+    devToggle.addEventListener("click", () => {
+      devMenu.style.display = devMenu.style.display === "none" ? "block" : "none";
+      if (devMenu.style.display === "block") {
+        devPassword.focus();
+      }
+    });
+
+    devClose.addEventListener("click", () => {
+      devMenu.style.display = "none";
+      devPassword.value = "";
+      devOptions.style.display = "none";
+    });
+
+    // Vérification du mot de passe
+    devLogin.addEventListener("click", () => {
+      const inputHash = simpleHash(devPassword.value);
+      if (inputHash === DEV_PASSWORD_HASH) {
+        devOptions.style.display = "block";
+        devPassword.value = "";
+        // Charger l'état actuel de la hitbox
+        const currentHitbox = localStorage.getItem("showHitbox");
+        hitboxToggle.checked = currentHitbox !== "false";
+      } else {
+        showPopup(
+          "❌",
+          "Accès refusé",
+          "Mot de passe incorrect !",
+          [{
+            text: "Réessayer",
+            action: "closePopup(this.closest('.popup-overlay'))"
+          }]
+        );
+        devPassword.value = "";
+      }
+    });
+
+    // Entrée pour valider le mot de passe
+    devPassword.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        devLogin.click();
+      }
+    });
+
+    // Réinitialiser le jeu
+    resetGame.addEventListener("click", () => {
+      if (confirm("⚠️ Êtes-vous sûr de vouloir réinitialiser le jeu ?\n\nCela supprimera :\n- Le meilleur score\n- Toutes les sélections\n- Tous les déverrouillages\n- Tous les diamants")) {
+        // Supprimer toutes les données du localStorage
+        localStorage.removeItem("bestScore");
+        localStorage.removeItem("selectedEmoji");
+        localStorage.removeItem("selectedPipeSkin");
+        localStorage.removeItem("selectedBackgroundSkin");
+        localStorage.removeItem("selectedGroundSkin");
+        localStorage.removeItem("showHitbox");
+        localStorage.removeItem("diamonds");
+        localStorage.removeItem("ownedItems");
+        localStorage.removeItem("lastSpinTime");
+        localStorage.removeItem("ownedBonusesExpiry");
+        localStorage.removeItem("ownedBonuses");
+        localStorage.removeItem("activeBonuses");
+        
+        // Recharger la page pour appliquer les changements
+        location.reload();
+      }
+    });
+
+    // Appliquer les options
+    devApply.addEventListener("click", () => {
+      // Sauvegarder l'état de la hitbox
+      localStorage.setItem("showHitbox", hitboxToggle.checked);
+      devMenu.style.display = "none";
+      showPopup(
+        "✅",
+        "Options appliquées",
+        "Les changements prendront effet au prochain lancement du jeu.",
+        [{
+          text: "Parfait",
+          action: "closePopup(this.closest('.popup-overlay'))"
+        }]
+      );
+    });
+
+    // Fermer le menu en cliquant à l'extérieur
+    devMenu.addEventListener("click", (e) => {
+      if (e.target === devMenu) {
+        devMenu.style.display = "none";
+        devPassword.value = "";
+        devOptions.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>

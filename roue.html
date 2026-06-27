@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roue de Chance - Flappy Emoji 🎡</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: "Segoe UI Emoji", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    #roue-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #FF9800, #FF5722);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .subtitle {
+      color: #666;
+      font-size: 1.1em;
+      margin-bottom: 30px;
+    }
+    
+    /* 🎡 ROUE DE CHANCE */
+    .spin-wheel-section {
+      background: linear-gradient(145deg, #fff3e0, #ffe0b2);
+      padding: 30px;
+      border-radius: 20px;
+      margin: 25px 0;
+      border: 3px solid #FF9800;
+      box-shadow: 0 8px 16px rgba(255, 152, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .spin-wheel-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shine 4s infinite;
+    }
+
+    .spin-wheel-section h3 {
+      color: #E65100;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .wheel-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    #wheelCanvas {
+      border-radius: 50%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+      position: relative;
+    }
+
+    #wheelCanvas:hover:not(.spinning) {
+      transform: scale(1.05);
+    }
+
+    #wheelCanvas.spinning {
+      cursor: not-allowed;
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 30px solid #FF5722;
+      z-index: 10;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .spin-btn {
+      background: linear-gradient(45deg, #FF9800, #FF5722);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2em;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .spin-btn::before {
+      content: '🎡';
+      margin-right: 10px;
+      animation: rotate 2s linear infinite;
+    }
+
+    .spin-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(255, 152, 0, 0.5);
+      background: linear-gradient(45deg, #FF5722, #FF9800);
+    }
+
+    .spin-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .spin-btn:disabled::before {
+      animation: none;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .cooldown-info {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 15px;
+      font-size: 1em;
+      color: #666;
+      font-weight: 600;
+      border: 2px solid #FF9800;
+      min-width: 250px;
+    }
+
+    .cooldown-info.ready {
+      color: #4CAF50;
+      border-color: #4CAF50;
+      background: rgba(232, 245, 232, 0.9);
+    }
+
+    .cooldown-time {
+      font-size: 1.3em;
+      color: #FF5722;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .cooldown-info.ready .cooldown-time {
+      color: #4CAF50;
+    }
+
+    .back-btn {
+      background: linear-gradient(45deg, #666, #999);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 20px 10px;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .diamonds-section {
+      background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      border: 2px solid #2196f3;
+    }
+
+    .diamonds-section h3 {
+      color: #1976d2;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+
+    .diamonds-amount {
+      font-size: 2em;
+      font-weight: bold;
+      color: #1976d2;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    /* 🎨 POPUP MODERNE */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .popup {
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      transform: scale(0.7) translateY(50px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .popup-overlay.show .popup {
+      transform: scale(1) translateY(0);
+    }
+
+    .popup::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #4CAF50, #2196F3, #FF9800, #E91E63);
+    }
+
+    .popup-icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+      animation: bounce 0.6s ease;
+    }
+
+    .popup-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .popup-message {
+      font-size: 1.1em;
+      color: #666;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    .popup-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .popup-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+
+    .popup-btn-primary {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      color: white;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+
+    .popup-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .popup-btn-secondary {
+      background: linear-gradient(45deg, #9E9E9E, #757575);
+      color: white;
+      box-shadow: 0 4px 15px rgba(158, 158, 158, 0.3);
+    }
+
+    .popup-btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(158, 158, 158, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div id="roue-container">
+    <button class="back-btn" id="backBtn">← Retour à la Boutique</button>
+    <h1>🎡 Roue de Chance</h1>
+    <p class="subtitle">Tournez la roue et gagnez des diamants !</p>
+    
+    <div class="diamonds-section">
+      <h3>💎 Vos Diamants</h3>
+      <div class="diamonds-amount" id="diamondsAmount">0</div>
+    </div>
+    
+    <!-- 🎡 ROUE DE CHANCE -->
+    <div class="spin-wheel-section">
+      <h3>🎡 Roue de Chance Quotidienne</h3>
+      <div class="wheel-container">
+        <div style="position: relative; display: inline-block;">
+          <div class="wheel-pointer"></div>
+          <canvas id="wheelCanvas" width="300" height="300"></canvas>
+        </div>
+        <button class="spin-btn" id="spinBtn">Tourner la roue</button>
+        <div class="cooldown-info" id="cooldownInfo">
+          <div>⏰ Prochain spin disponible dans :</div>
+          <div class="cooldown-time" id="cooldownTime">Calcul...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🎨 FONCTIONS POPUP MODERNE
+    function showPopup(icon, title, message, buttons = []) {
+      // Créer l'overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'popup-overlay';
+      
+      // Créer le popup
+      const popup = document.createElement('div');
+      popup.className = 'popup';
+      
+      popup.innerHTML = `
+        <div class="popup-icon">${icon}</div>
+        <div class="popup-title">${title}</div>
+        <div class="popup-message">${message}</div>
+        <div class="popup-buttons">
+          ${buttons.map(btn => 
+            `<button class="popup-btn ${btn.class || 'popup-btn-primary'}" onclick="${btn.action}">${btn.text}</button>`
+          ).join('')}
+        </div>
+      `;
+      
+      overlay.appendChild(popup);
+      document.body.appendChild(overlay);
+      
+      // Animation d'apparition
+      setTimeout(() => overlay.classList.add('show'), 10);
+      
+      // Fermer en cliquant sur l'overlay
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          closePopup(overlay);
+        }
+      });
+      
+      return overlay;
+    }
+    
+    function closePopup(overlay) {
+      overlay.classList.remove('show');
+      setTimeout(() => {
+        if (overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
+        }
+      }, 300);
+    }
+
+    // 🎡 ROUE DE CHANCE - Variables
+    let wheelCanvas, wheelCtx, spinBtn, cooldownInfo, cooldownTime;
+    
+    // Récompenses de la roue (en diamants)
+    const wheelRewards = [5, 10, 15, 20, 25, 30, 50, 100];
+    const wheelColors = [
+      "#FF6B6B", "#4ECDC4", "#45B7D1", "#FFA07A",
+      "#98D8C8", "#F7DC6F", "#BB8FCE", "#85C1E2"
+    ];
+    let isSpinning = false;
+    let wheelRotation = 0;
+    const SPIN_DURATION = 3000; // 3 secondes
+    const COOLDOWN_HOURS = 24;
+
+    // 🔹 Variables
+    let diamonds = parseInt(localStorage.getItem("diamonds") || "0");
+    const diamondsAmountEl = document.getElementById("diamondsAmount");
+
+    // 🎡 FONCTIONS ROUE DE CHANCE
+    function drawWheel() {
+      if (!wheelCanvas || !wheelCtx) return;
+      
+      const centerX = wheelCanvas.width / 2;
+      const centerY = wheelCanvas.height / 2;
+      const radius = Math.min(centerX, centerY) - 10;
+      const sliceAngle = (2 * Math.PI) / wheelRewards.length;
+      
+      wheelCtx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+      
+      // Dessiner chaque tranche
+      wheelRewards.forEach((reward, index) => {
+        const startAngle = index * sliceAngle + wheelRotation;
+        const endAngle = (index + 1) * sliceAngle + wheelRotation;
+        
+        // Dessiner la tranche
+        wheelCtx.beginPath();
+        wheelCtx.moveTo(centerX, centerY);
+        wheelCtx.arc(centerX, centerY, radius, startAngle, endAngle);
+        wheelCtx.closePath();
+        wheelCtx.fillStyle = wheelColors[index % wheelColors.length];
+        wheelCtx.fill();
+        
+        // Bordure
+        wheelCtx.strokeStyle = "#fff";
+        wheelCtx.lineWidth = 2;
+        wheelCtx.stroke();
+        
+        // Texte
+        wheelCtx.save();
+        wheelCtx.translate(centerX, centerY);
+        wheelCtx.rotate(startAngle + sliceAngle / 2);
+        wheelCtx.textAlign = "center";
+        wheelCtx.textBaseline = "middle";
+        wheelCtx.fillStyle = "#fff";
+        wheelCtx.font = "bold 18px Arial";
+        wheelCtx.fillText(`${reward}💎`, radius * 0.7, 0);
+        wheelCtx.restore();
+      });
+      
+      // Cercle central
+      wheelCtx.beginPath();
+      wheelCtx.arc(centerX, centerY, 30, 0, 2 * Math.PI);
+      wheelCtx.fillStyle = "#FF5722";
+      wheelCtx.fill();
+      wheelCtx.strokeStyle = "#fff";
+      wheelCtx.lineWidth = 3;
+      wheelCtx.stroke();
+    }
+    
+    function spinWheel() {
+      if (!wheelCanvas || !wheelCtx || isSpinning) return;
+      
+      // Vérifier le cooldown
+      if (!canSpin()) {
+        showPopup(
+          "⏰",
+          "Roue non disponible",
+          "Vous devez attendre avant de pouvoir tourner la roue à nouveau !",
+          [{
+            text: "Compris",
+            action: "closePopup(this.closest('.popup-overlay'))"
+          }]
+        );
+        return;
+      }
+      
+      isSpinning = true;
+      wheelCanvas.classList.add("spinning");
+      spinBtn.disabled = true;
+      
+      // Sélectionner aléatoirement une récompense
+      const selectedReward = wheelRewards[Math.floor(Math.random() * wheelRewards.length)];
+      const selectedIndex = wheelRewards.indexOf(selectedReward);
+      const sliceAngle = (2 * Math.PI) / wheelRewards.length;
+      
+      // Calculer l'angle final (faire tourner plusieurs fois + s'arrêter sur la récompense)
+      const spins = 5; // Nombre de tours complets
+      const targetAngle = selectedIndex * sliceAngle - sliceAngle / 2; // Centre de la tranche
+      const finalRotation = wheelRotation + (spins * 2 * Math.PI) + targetAngle;
+      
+      // Animation
+      const startRotation = wheelRotation;
+      const rotationDiff = finalRotation - startRotation;
+      const startTime = Date.now();
+      
+      function animate() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / SPIN_DURATION, 1);
+        
+        // Fonction d'easing (ease-out)
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        
+        wheelRotation = startRotation + rotationDiff * easeOut;
+        drawWheel();
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // Animation terminée
+          isSpinning = false;
+          wheelCanvas.classList.remove("spinning");
+          
+          // Donner la récompense
+          diamonds += selectedReward;
+          localStorage.setItem("diamonds", diamonds.toString());
+          updateDiamondsDisplay();
+          
+          // Sauvegarder le timestamp du dernier spin
+          localStorage.setItem("lastSpinTime", Date.now().toString());
+          updateCooldownDisplay();
+          
+          // Popup de récompense
+          showPopup(
+            "🎉",
+            "Félicitations !",
+            `Vous avez gagné <strong>${selectedReward} 💎</strong> !<br><br>Revenez dans 24h pour un nouveau spin !`,
+            [{
+              text: "Merci !",
+              action: "closePopup(this.closest('.popup-overlay'))"
+            }]
+          );
+        }
+      }
+      
+      animate();
+    }
+    
+    function canSpin() {
+      const lastSpinTime = parseInt(localStorage.getItem("lastSpinTime") || "0");
+      // Si jamais utilisée, permettre le spin
+      if (lastSpinTime === 0) return true;
+      
+      const now = Date.now();
+      const timeSinceLastSpin = now - lastSpinTime;
+      const cooldownMs = COOLDOWN_HOURS * 60 * 60 * 1000; // 24h en millisecondes
+      
+      return timeSinceLastSpin >= cooldownMs;
+    }
+    
+    function updateCooldownDisplay() {
+      if (!cooldownInfo || !cooldownTime || !spinBtn) return;
+      
+      const lastSpinTime = parseInt(localStorage.getItem("lastSpinTime") || "0");
+      
+      if (canSpin()) {
+        cooldownInfo.classList.add("ready");
+        const firstDiv = cooldownInfo.querySelector("div:first-child");
+        const secondDiv = cooldownInfo.querySelector(".cooldown-time");
+        if (firstDiv) firstDiv.textContent = "✅ Roue disponible !";
+        if (secondDiv) secondDiv.textContent = "Vous pouvez tourner maintenant !";
+        spinBtn.disabled = false;
+      } else {
+        cooldownInfo.classList.remove("ready");
+        const now = Date.now();
+        const timeSinceLastSpin = now - lastSpinTime;
+        const cooldownMs = COOLDOWN_HOURS * 60 * 60 * 1000;
+        const timeRemaining = Math.max(0, cooldownMs - timeSinceLastSpin);
+        
+        const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+        
+        const firstDiv = cooldownInfo.querySelector("div:first-child");
+        if (firstDiv) firstDiv.textContent = "⏰ Prochain spin disponible dans :";
+        if (cooldownTime) {
+          cooldownTime.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        spinBtn.disabled = true;
+      }
+    }
+
+    function updateDiamondsDisplay() {
+      diamonds = parseInt(localStorage.getItem("diamonds") || "0");
+      if (diamondsAmountEl) {
+        diamondsAmountEl.textContent = diamonds;
+      }
+    }
+    
+    // 🎡 Initialiser la roue après le chargement du DOM
+    function initWheel() {
+      wheelCanvas = document.getElementById("wheelCanvas");
+      wheelCtx = wheelCanvas?.getContext("2d");
+      spinBtn = document.getElementById("spinBtn");
+      cooldownInfo = document.getElementById("cooldownInfo");
+      cooldownTime = document.getElementById("cooldownTime");
+      
+      if (!wheelCanvas || !wheelCtx) {
+        console.error("Roue de chance: Canvas non trouvé");
+        return;
+      }
+      
+      // Initialiser la roue
+      drawWheel();
+      updateCooldownDisplay();
+      updateDiamondsDisplay();
+      
+      // Mettre à jour le cooldown toutes les secondes
+      setInterval(updateCooldownDisplay, 1000);
+      
+      // Event listener pour le bouton
+      if (spinBtn) {
+        spinBtn.addEventListener("click", spinWheel);
+      }
+    }
+    
+    // Event listener pour le bouton retour
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "boutique.html";
+    });
+    
+    // Attendre que le DOM soit chargé
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initWheel);
+    } else {
+      initWheel();
+    }
+  </script>
+</body>
+</html>
+

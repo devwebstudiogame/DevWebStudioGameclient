@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boutique - Flappy Emoji 🛒</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: "Segoe UI Emoji", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    #boutique {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 900px;
+      width: 100%;
+      padding: 40px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      background: linear-gradient(45deg, #ff6b6b, #4ec0ca);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .subtitle {
+      color: #666;
+      font-size: 1.1em;
+      margin-bottom: 30px;
+    }
+    
+    .section {
+      margin: 25px 0;
+      padding: 25px;
+      background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+      border-radius: 20px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    
+    .section h3 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+      font-size: 1.4em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .shop-item {
+      display: inline-block;
+      margin: 15px;
+      padding: 20px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: 3px solid transparent;
+      transition: all 0.3s ease;
+      position: relative;
+      min-width: 150px;
+    }
+    
+    .shop-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      border-color: #ff6b6b;
+    }
+    
+    .shop-item.owned {
+      border-color: #4CAF50;
+      background: linear-gradient(145deg, #e8f5e8, #f1f8e9);
+    }
+    
+    .shop-item.rare {
+      border-color: #FFD700;
+      background: linear-gradient(145deg, #fff8e1, #fffbf0);
+    }
+    
+    .shop-item.legendary {
+      border-color: #9C27B0;
+      background: linear-gradient(145deg, #f3e5f5, #fce4ec);
+    }
+    
+    .item-emoji {
+      font-size: 50px;
+      margin-bottom: 10px;
+    }
+    
+    .item-name {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .item-price {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ff6b6b;
+      margin-bottom: 10px;
+    }
+    
+    .item-price.owned {
+      color: #4CAF50;
+    }
+    
+    .buy-btn {
+      background: linear-gradient(45deg, #ff6b6b, #4ec0ca);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    
+    .buy-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .buy-btn.owned {
+      background: #4CAF50;
+      cursor: default;
+    }
+    
+    .buy-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .rarity-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      padding: 4px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: bold;
+      color: white;
+    }
+    
+    .rarity-rare {
+      background: #FFD700;
+      color: #333;
+    }
+    
+    .rarity-legendary {
+      background: #9C27B0;
+    }
+    
+    .back-btn {
+      background: linear-gradient(45deg, #666, #999);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 20px 10px;
+      transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .diamonds-section {
+      background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      border: 2px solid #2196f3;
+    }
+    
+    .diamonds-section h3 {
+      color: #1976d2;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+    }
+    
+    .diamonds-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .diamonds-amount {
+      font-size: 2em;
+      font-weight: bold;
+      color: #1976d2;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    .diamonds-description p {
+      color: #1976d2;
+      font-size: 0.9em;
+      margin: 0;
+    }
+    
+    
+    
+    .dev-toggle {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      color: rgba(255, 255, 255, 0.3);
+      border: none;
+      padding: 4px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 10px;
+      z-index: 999;
+      transition: all 0.3s ease;
+      opacity: 0.1;
+    }
+    
+    .dev-toggle:hover {
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    
+    #devMenu {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      border: 2px solid #ff6b6b;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: none;
+      text-align: center;
+      min-width: 300px;
+    }
+    
+    #devMenu h3 {
+      color: #ff6b6b;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+    
+    #devMenu input {
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid #333;
+      border-radius: 5px;
+      background: #222;
+      color: white;
+      font-size: 16px;
+      width: 200px;
+    }
+    
+    #devMenu button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #ff6b6b;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    #devMenu button:hover {
+      background: #ff5252;
+    }
+    
+    #devMenu .dev-options {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    
+    #devMenu .dev-options label {
+      display: block;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    
+    #devMenu .dev-options input[type="checkbox"] {
+      width: auto;
+      margin-right: 10px;
+    }
+    
+    
+    /* Animations premium */
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+    
+    @keyframes particles {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .premium-pipe-preview {
+      animation: pulse 2s infinite;
+    }
+    
+    .premium-bg-preview {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+    
+    /* 🎨 POPUP MODERNE */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .popup {
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      transform: scale(0.7) translateY(50px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .popup-overlay.show .popup {
+      transform: scale(1) translateY(0);
+    }
+    
+    .popup::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #4CAF50, #2196F3, #FF9800, #E91E63);
+    }
+    
+    .popup-icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+      animation: bounce 0.6s ease;
+    }
+    
+    .popup-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    
+    .popup-message {
+      font-size: 1.1em;
+      color: #666;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+    
+    .popup-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+    
+    .popup-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+    
+    .popup-btn-primary {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      color: white;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .popup-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+    
+    .popup-btn-secondary {
+      background: linear-gradient(45deg, #9E9E9E, #757575);
+      color: white;
+      box-shadow: 0 4px 15px rgba(158, 158, 158, 0.3);
+    }
+    
+    .popup-btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(158, 158, 158, 0.4);
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    .wheel-btn {
+      background: linear-gradient(45deg, #FF9800, #FF5722);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2em;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 20px 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wheel-btn::before {
+      content: '🎡';
+      margin-right: 10px;
+    }
+
+    .wheel-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(255, 152, 0, 0.5);
+      background: linear-gradient(45deg, #FF5722, #FF9800);
+    }
+  </style>
+</head>
+<body>
+  <div id="boutique">
+    <button class="back-btn" id="backBtn">← Retour au Menu</button>
+    <h1>🛒 Boutique</h1>
+    <p class="subtitle">Skins rares et exclusifs à acheter avec des diamants !</p>
+    
+    <div class="diamonds-section">
+      <h3>💎 Diamants</h3>
+      <div class="diamonds-info">
+        <span class="diamonds-amount" id="diamondsAmount">0</span>
+        <div class="diamonds-description">
+          <p>Gagnez 1 diamant tous les 30 points en jeu !</p>
+        </div>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <button class="wheel-btn" id="wheelBtn">Roue de Chance Quotidienne</button>
+    </div>
+    
+    <div class="section">
+      <h3>🎭 Emojis Rares</h3>
+      <div id="rareEmojis"></div>
+    </div>
+    
+    <div class="section">
+      <h3>🔧 Tuyaux Légendaires</h3>
+      <div id="legendaryPipes"></div>
+    </div>
+    
+    <div class="section">
+      <h3>🌅 Arrière-plans Exclusifs</h3>
+      <div id="exclusiveBackgrounds"></div>
+    </div>
+    
+    <div class="section">
+      <h3>🌱 Sols Exclusifs</h3>
+      <div id="exclusiveGrounds"></div>
+    </div>
+    
+    
+    <button class="back-btn" onclick="window.location.href='menu.html'">🏠 Retour au Menu</button>
+  </div>
+
+  <!-- Bouton développeur caché -->
+  <button class="dev-toggle" id="devToggle" title="Dev">•</button>
+  
+  <!-- Menu développeur -->
+  <div id="devMenu">
+    <h3>🔧 Menu Développeur</h3>
+    <p>Entrez le mot de passe :</p>
+    <input type="password" id="devPassword" placeholder="Mot de passe">
+    <br>
+    <button id="devLogin">Se connecter</button>
+    <button id="devClose">Fermer</button>
+    
+    <div class="dev-options" id="devOptions" style="display: none;">
+      <h4>Options de développement :</h4>
+      <label>
+        <input type="checkbox" id="unlockAllShop">
+        Débloquer tous les skins de la boutique
+      </label>
+      <br>
+      <br>
+        <button id="unlockAllSkins">🎉 Débloquer tous les skins</button>
+        <button id="removeAllSkins">🗑️ Enlever tous les skins</button>
+        
+      <br>
+      <button id="devApply">Appliquer</button>
+    </div>
+  </div>
+
+  <script>
+    // 🎨 FONCTIONS POPUP MODERNE
+    function showPopup(icon, title, message, buttons = []) {
+      // Créer l'overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'popup-overlay';
+      
+      // Créer le popup
+      const popup = document.createElement('div');
+      popup.className = 'popup';
+      
+      popup.innerHTML = `
+        <div class="popup-icon">${icon}</div>
+        <div class="popup-title">${title}</div>
+        <div class="popup-message">${message}</div>
+        <div class="popup-buttons">
+          ${buttons.map(btn => 
+            `<button class="popup-btn ${btn.class || 'popup-btn-primary'}" onclick="${btn.action}">${btn.text}</button>`
+          ).join('')}
+        </div>
+      `;
+      
+      overlay.appendChild(popup);
+      document.body.appendChild(overlay);
+      
+      // Animation d'apparition
+      setTimeout(() => overlay.classList.add('show'), 10);
+      
+      // Fermer en cliquant sur l'overlay
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          closePopup(overlay);
+        }
+      });
+      
+      return overlay;
+    }
+    
+    function closePopup(overlay) {
+      overlay.classList.remove('show');
+      setTimeout(() => {
+        if (overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
+        }
+      }, 300);
+    }
+    
+    // 🔹 Liste des emojis rares
+    const rareEmojis = [
+      { emoji: "👑", name: "Couronne", price: 30, rarity: "rare", owned: false },
+      { emoji: "💎", name: "Diamant", price: 40, rarity: "rare", owned: false },
+      { emoji: "🔥", name: "Flamme", price: 50, rarity: "epic", owned: false },
+      { emoji: "⚡", name: "Éclair", price: 60, rarity: "epic", owned: false },
+      { emoji: "🌟", name: "Étoile", price: 80, rarity: "legendary", owned: false }
+    ];
+
+    // 🔹 Liste des tuyaux légendaires
+    const legendaryPipes = [
+      { name: "Cristal Prismatique", color: "linear-gradient(45deg, #ff0080, #00ff80, #8000ff, #ff8000)", price: 35, rarity: "legendary", owned: false, effect: "Prismatique" },
+      { name: "Or Pur 24K", color: "linear-gradient(45deg, #FFD700, #FFA500, #FF8C00)", price: 45, rarity: "legendary", owned: false, effect: "Or pur" },
+      { name: "Diamant Noir", color: "linear-gradient(45deg, #000000, #1a1a1a, #333333)", price: 55, rarity: "legendary", owned: false, effect: "Diamant noir" },
+      { name: "Plasma Quantique", color: "linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ff00)", price: 65, rarity: "legendary", owned: false, effect: "Plasma" },
+      { name: "Matière Noire", color: "linear-gradient(45deg, #2c1810, #1a0e0a, #0d0603)", price: 75, rarity: "legendary", owned: false, effect: "Matière noire" },
+      { name: "Énergie Cosmique", color: "linear-gradient(45deg, #ff6b6b, #4ec0ca, #45b7d1, #96ceb4)", price: 85, rarity: "legendary", owned: false, effect: "Cosmique" }
+    ];
+
+    // 🔹 Liste des arrière-plans exclusifs
+    const exclusiveBackgrounds = [
+      { name: "Nébuleuse d'Orion", colors: ["#0c0c0c", "#1a1a2e", "#16213e", "#0f3460", "#e94560"], price: 40, rarity: "legendary", owned: false, effect: "Nébuleuse" },
+      { name: "Trou Noir", colors: ["#000000", "#1a1a1a", "#2d2d2d", "#000000"], price: 50, rarity: "legendary", owned: false, effect: "Trou noir" },
+      { name: "Big Bang", colors: ["#ff0000", "#ff8000", "#ffff00", "#00ff00", "#0080ff", "#8000ff"], price: 60, rarity: "legendary", owned: false, effect: "Big Bang" },
+      { name: "Dimension Parallèle", colors: ["#667eea", "#764ba2", "#f093fb", "#f5576c", "#4facfe"], price: 70, rarity: "legendary", owned: false, effect: "Dimension" },
+      { name: "Univers Holographique", colors: ["#ff00ff", "#00ffff", "#ffff00", "#ff0080", "#8000ff"], price: 80, rarity: "legendary", owned: false, effect: "Holographique" },
+      { name: "Multivers Infini", colors: ["#ff6b6b", "#4ec0ca", "#45b7d1", "#96ceb4", "#feca57", "#ff9ff3"], price: 100, rarity: "legendary", owned: false, effect: "Multivers" }
+    ];
+
+    // 🔹 Sols exclusifs de la boutique
+    const exclusiveGrounds = [
+      { name: "Or Pur", color: "linear-gradient(45deg, #FFD700, #FFA500)", price: 30, rarity: "rare", owned: false, effect: "Or" },
+      { name: "Diamant", color: "linear-gradient(45deg, #E1F5FE, #B3E5FC, #81D4FA)", price: 40, rarity: "epic", owned: false, effect: "Diamant" },
+      { name: "Néon", color: "linear-gradient(45deg, #00E676, #00BCD4, #3F51B5)", price: 50, rarity: "legendary", owned: false, effect: "Néon" },
+      { name: "Plasma", color: "linear-gradient(45deg, #FF4081, #E91E63, #9C27B0)", price: 60, rarity: "legendary", owned: false, effect: "Plasma" },
+      { name: "Cosmos", color: "linear-gradient(45deg, #1A1A2E, #16213E, #0F3460)", price: 70, rarity: "legendary", owned: false, effect: "Cosmos" },
+      { name: "Holographique", color: "linear-gradient(45deg, #FF00FF, #00FFFF, #FFFF00)", price: 90, rarity: "legendary", owned: false, effect: "Holographique" }
+    ];
+
+    // 🔹 Variables
+    let ownedItems = JSON.parse(localStorage.getItem("ownedItems") || "[]");
+    let diamonds = parseInt(localStorage.getItem("diamonds") || "0");
+    
+
+    // 🔹 Éléments DOM
+    const diamondsAmountEl = document.getElementById("diamondsAmount");
+    const rareEmojisDiv = document.getElementById("rareEmojis");
+    const legendaryPipesDiv = document.getElementById("legendaryPipes");
+    const exclusiveBackgroundsDiv = document.getElementById("exclusiveBackgrounds");
+    const exclusiveGroundsDiv = document.getElementById("exclusiveGrounds");
+
+    // 🔹 Fonction utilitaire pour la validation des données
+    function simpleHash(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return hash.toString();
+    }
+
+    // Configuration de sécurité pour les paramètres utilisateur
+    const DEV_PASSWORD_HASH = simpleHash("2025");
+
+    // 🔹 Fonction pour mettre à jour l'affichage
+    function updateDisplay() {
+      diamondsAmountEl.textContent = diamonds;
+      
+      // Afficher les emojis rares
+      rareEmojisDiv.innerHTML = "";
+      rareEmojis.forEach((item, index) => {
+        const isOwned = ownedItems.includes(`emoji_${index}`);
+        const itemEl = createShopItem(item, `emoji_${index}`, isOwned, () => buyItem(item, `emoji_${index}`, index));
+        rareEmojisDiv.appendChild(itemEl);
+      });
+
+      // Afficher les tuyaux légendaires
+      legendaryPipesDiv.innerHTML = "";
+      legendaryPipes.forEach((item, index) => {
+        const isOwned = ownedItems.includes(`pipe_${index}`);
+        const itemEl = createShopItem(item, `pipe_${index}`, isOwned, () => buyItem(item, `pipe_${index}`, index));
+        legendaryPipesDiv.appendChild(itemEl);
+      });
+
+      // Afficher les arrière-plans exclusifs
+      exclusiveBackgroundsDiv.innerHTML = "";
+      exclusiveBackgrounds.forEach((item, index) => {
+        const isOwned = ownedItems.includes(`bg_${index}`);
+        const itemEl = createShopItem(item, `bg_${index}`, isOwned, () => buyItem(item, `bg_${index}`, index));
+        exclusiveBackgroundsDiv.appendChild(itemEl);
+      });
+      
+      // Afficher les sols exclusifs
+      exclusiveGroundsDiv.innerHTML = "";
+      exclusiveGrounds.forEach((item, index) => {
+        const isOwned = ownedItems.includes(`ground_${index}`);
+        const itemEl = createShopItem(item, `ground_${index}`, isOwned, () => buyItem(item, `ground_${index}`, index));
+        exclusiveGroundsDiv.appendChild(itemEl);
+      });
+    }
+
+    // 🔹 Fonction pour créer un élément de boutique
+    function createShopItem(item, itemId, isOwned, onBuy) {
+      const div = document.createElement("div");
+      div.className = `shop-item ${item.rarity} ${isOwned ? 'owned' : ''}`;
+      
+      const rarityBadge = document.createElement("div");
+      rarityBadge.className = `rarity-badge rarity-${item.rarity}`;
+      rarityBadge.textContent = item.rarity.toUpperCase();
+      div.appendChild(rarityBadge);
+
+      if (item.emoji) {
+        const emoji = document.createElement("div");
+        emoji.className = "item-emoji";
+        emoji.textContent = item.emoji;
+        div.appendChild(emoji);
+      } else if (item.color) {
+        const colorPreview = document.createElement("div");
+        colorPreview.className = "premium-pipe-preview";
+        colorPreview.style.width = "80px";
+        colorPreview.style.height = "80px";
+        colorPreview.style.margin = "0 auto 10px";
+        colorPreview.style.borderRadius = "15px";
+        colorPreview.style.position = "relative";
+        colorPreview.style.overflow = "hidden";
+        colorPreview.style.boxShadow = "0 8px 25px rgba(0,0,0,0.3)";
+        
+        if (item.color.startsWith("linear-gradient")) {
+          colorPreview.style.background = item.color;
+        } else {
+          colorPreview.style.backgroundColor = item.color;
+        }
+        
+        // Effet de brillance
+        const shine = document.createElement("div");
+        shine.style.position = "absolute";
+        shine.style.top = "-50%";
+        shine.style.left = "-50%";
+        shine.style.width = "200%";
+        shine.style.height = "200%";
+        shine.style.background = "linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent)";
+        shine.style.animation = "shine 3s infinite";
+        colorPreview.appendChild(shine);
+        
+        // Badge premium
+        if (item.effect) {
+          const effectBadge = document.createElement("div");
+          effectBadge.className = "premium-effect-badge";
+          effectBadge.textContent = item.effect;
+          effectBadge.style.position = "absolute";
+          effectBadge.style.bottom = "5px";
+          effectBadge.style.right = "5px";
+          effectBadge.style.background = "rgba(0,0,0,0.7)";
+          effectBadge.style.color = "white";
+          effectBadge.style.padding = "2px 6px";
+          effectBadge.style.borderRadius = "10px";
+          effectBadge.style.fontSize = "10px";
+          effectBadge.style.fontWeight = "bold";
+          colorPreview.appendChild(effectBadge);
+        }
+        
+        div.appendChild(colorPreview);
+      } else if (item.colors) {
+        const bgPreview = document.createElement("div");
+        bgPreview.className = "premium-bg-preview";
+        bgPreview.style.width = "80px";
+        bgPreview.style.height = "80px";
+        bgPreview.style.margin = "0 auto 10px";
+        bgPreview.style.borderRadius = "15px";
+        bgPreview.style.position = "relative";
+        bgPreview.style.overflow = "hidden";
+        bgPreview.style.boxShadow = "0 8px 25px rgba(0,0,0,0.3)";
+        bgPreview.style.background = `linear-gradient(to bottom, ${item.colors.join(", ")})`;
+        
+        // Effet de particules
+        const particles = document.createElement("div");
+        particles.style.position = "absolute";
+        particles.style.top = "0";
+        particles.style.left = "0";
+        particles.style.width = "100%";
+        particles.style.height = "100%";
+        particles.style.background = "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 1px, transparent 1px)";
+        particles.style.backgroundSize = "20px 20px";
+        particles.style.animation = "particles 4s infinite";
+        bgPreview.appendChild(particles);
+        
+        // Badge premium
+        if (item.effect) {
+          const effectBadge = document.createElement("div");
+          effectBadge.className = "premium-effect-badge";
+          effectBadge.textContent = item.effect;
+          effectBadge.style.position = "absolute";
+          effectBadge.style.bottom = "5px";
+          effectBadge.style.right = "5px";
+          effectBadge.style.background = "rgba(0,0,0,0.7)";
+          effectBadge.style.color = "white";
+          effectBadge.style.padding = "2px 6px";
+          effectBadge.style.borderRadius = "10px";
+          effectBadge.style.fontSize = "10px";
+          effectBadge.style.fontWeight = "bold";
+          bgPreview.appendChild(effectBadge);
+        }
+        
+        div.appendChild(bgPreview);
+      } else if (item.color && item.color.startsWith("linear-gradient")) {
+        // Aperçu de sol avec dégradé
+        const groundPreview = document.createElement("div");
+        groundPreview.className = "premium-ground-preview";
+        groundPreview.style.width = "80px";
+        groundPreview.style.height = "80px";
+        groundPreview.style.margin = "0 auto 10px";
+        groundPreview.style.borderRadius = "15px";
+        groundPreview.style.position = "relative";
+        groundPreview.style.overflow = "hidden";
+        groundPreview.style.boxShadow = "0 8px 25px rgba(0,0,0,0.3)";
+        groundPreview.style.background = item.color;
+        
+        // Effet de brillance pour les sols
+        const shine = document.createElement("div");
+        shine.style.position = "absolute";
+        shine.style.top = "-50%";
+        shine.style.left = "-50%";
+        shine.style.width = "200%";
+        shine.style.height = "200%";
+        shine.style.background = "linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent)";
+        shine.style.animation = "shine 3s infinite";
+        groundPreview.appendChild(shine);
+        
+        // Badge premium
+        if (item.effect) {
+          const effectBadge = document.createElement("div");
+          effectBadge.className = "premium-effect-badge";
+          effectBadge.textContent = item.effect;
+          effectBadge.style.position = "absolute";
+          effectBadge.style.bottom = "5px";
+          effectBadge.style.right = "5px";
+          effectBadge.style.background = "rgba(0,0,0,0.7)";
+          effectBadge.style.color = "white";
+          effectBadge.style.padding = "2px 6px";
+          effectBadge.style.borderRadius = "10px";
+          effectBadge.style.fontSize = "10px";
+          effectBadge.style.fontWeight = "bold";
+          groundPreview.appendChild(effectBadge);
+        }
+        
+        div.appendChild(groundPreview);
+      }
+
+      const name = document.createElement("div");
+      name.className = "item-name";
+      name.textContent = item.name;
+      div.appendChild(name);
+
+      const price = document.createElement("div");
+      price.className = `item-price ${isOwned ? 'owned' : ''}`;
+      price.textContent = isOwned ? "Possédé ✓" : `${item.price} 💎`;
+      div.appendChild(price);
+
+      const buyBtn = document.createElement("button");
+      buyBtn.className = `buy-btn ${isOwned ? 'owned' : ''}`;
+      buyBtn.textContent = isOwned ? "Possédé" : "Acheter";
+      buyBtn.disabled = isOwned || diamonds < item.price;
+      buyBtn.onclick = onBuy;
+      div.appendChild(buyBtn);
+
+      return div;
+    }
+
+    // 🔹 Fonction pour acheter un item avec des diamants
+    function buyItem(item, itemId, index) {
+      if (diamonds >= item.price && !ownedItems.includes(itemId)) {
+        if (confirm(`Acheter ${item.name} pour ${item.price} 💎 ?`)) {
+          diamonds -= item.price;
+          ownedItems.push(itemId);
+          localStorage.setItem("diamonds", diamonds.toString());
+          localStorage.setItem("ownedItems", JSON.stringify(ownedItems));
+          updateDisplay();
+          showPopup(
+            "✅",
+            "Achat réussi !",
+            `${item.name} a été ajouté à votre collection !`,
+            [{
+              text: "Parfait",
+              action: "closePopup(this.closest('.popup-overlay'))"
+            }]
+          );
+        }
+      } else if (diamonds < item.price) {
+        showPopup(
+          "❌",
+          "Diamants insuffisants",
+          `Vous avez ${diamonds} 💎<br>Il vous faut ${item.price} 💎`,
+          [{
+            text: "Compris",
+            action: "closePopup(this.closest('.popup-overlay'))"
+          }]
+        );
+      }
+    }
+    
+    
+    
+    
+
+    // 🔹 Menu développeur
+    const devToggle = document.getElementById("devToggle");
+    const devMenu = document.getElementById("devMenu");
+    const devPassword = document.getElementById("devPassword");
+    const devLogin = document.getElementById("devLogin");
+    const devClose = document.getElementById("devClose");
+    const devOptions = document.getElementById("devOptions");
+    const unlockAllShop = document.getElementById("unlockAllShop");
+    const infiniteMoney = document.getElementById("infiniteMoney");
+    const devApply = document.getElementById("devApply");
+
+    devToggle.addEventListener("click", () => {
+      devMenu.style.display = devMenu.style.display === "none" ? "block" : "none";
+      if (devMenu.style.display === "block") {
+        devPassword.focus();
+      }
+    });
+
+    devClose.addEventListener("click", () => {
+      devMenu.style.display = "none";
+      devPassword.value = "";
+      devOptions.style.display = "none";
+    });
+
+    devLogin.addEventListener("click", () => {
+      const inputHash = simpleHash(devPassword.value);
+      if (inputHash === DEV_PASSWORD_HASH) {
+        devOptions.style.display = "block";
+        devPassword.value = "";
+      } else {
+        showPopup(
+          "❌",
+          "Accès refusé",
+          "Mot de passe incorrect !",
+          [{
+            text: "Réessayer",
+            action: "closePopup(this.closest('.popup-overlay'))"
+          }]
+        );
+        devPassword.value = "";
+      }
+    });
+
+    devPassword.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        devLogin.click();
+      }
+    });
+
+    devApply.addEventListener("click", () => {
+      if (unlockAllShop.checked) {
+        // Débloquer tous les items
+        const allItems = [];
+        for (let i = 0; i < rareEmojis.length; i++) allItems.push(`emoji_${i}`);
+        for (let i = 0; i < legendaryPipes.length; i++) allItems.push(`pipe_${i}`);
+        for (let i = 0; i < exclusiveBackgrounds.length; i++) allItems.push(`bg_${i}`);
+        for (let i = 0; i < exclusiveGrounds.length; i++) allItems.push(`ground_${i}`);
+        ownedItems = allItems;
+        localStorage.setItem("ownedItems", JSON.stringify(ownedItems));
+      }
+      
+      
+      devMenu.style.display = "none";
+      updateDisplay();
+      showPopup(
+        "✅",
+        "Options appliquées",
+        "Les modifications ont été sauvegardées !",
+        [{
+          text: "Parfait",
+          action: "closePopup(this.closest('.popup-overlay'))"
+        }]
+      );
+    });
+    
+    // 🔹 Event listeners
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "menu.html";
+    });
+    
+    // 🔹 Initialisation
+    updateDisplay();
+    
+    // 🎡 Bouton pour accéder à la roue de chance
+    document.getElementById("wheelBtn").addEventListener("click", () => {
+      window.location.href = "roue.html";
+    });
+    
+    // Bouton pour débloquer tous les skins (ajouté après l'initialisation)
+    const unlockAllSkinsBtn = document.getElementById("unlockAllSkins");
+    if (unlockAllSkinsBtn) {
+      unlockAllSkinsBtn.addEventListener("click", () => {
+        // Débloquer tous les emojis
+        rareEmojis.forEach((item, index) => {
+          const itemId = `emoji_${index}`;
+          if (!ownedItems.includes(itemId)) {
+            ownedItems.push(itemId);
+          }
+        });
+        
+        // Débloquer tous les tuyaux
+        legendaryPipes.forEach((item, index) => {
+          const itemId = `pipe_${index}`;
+          if (!ownedItems.includes(itemId)) {
+            ownedItems.push(itemId);
+          }
+        });
+        
+        // Débloquer tous les arrière-plans
+        exclusiveBackgrounds.forEach((item, index) => {
+          const itemId = `bg_${index}`;
+          if (!ownedItems.includes(itemId)) {
+            ownedItems.push(itemId);
+          }
+        });
+        
+        // Débloquer tous les sols
+        exclusiveGrounds.forEach((item, index) => {
+          const itemId = `ground_${index}`;
+          if (!ownedItems.includes(itemId)) {
+            ownedItems.push(itemId);
+          }
+        });
+        
+        localStorage.setItem("ownedItems", JSON.stringify(ownedItems));
+        updateDisplay();
+        showPopup(
+          "🎉",
+          "Déblocage réussi !",
+          "Tous les skins ont été débloqués !<br><br>Profitez de votre collection complète !",
+          [{
+            text: "Génial !",
+            action: "closePopup(this.closest('.popup-overlay'))"
+          }]
+        );
+      });
+    }
+    
+    // Bouton pour enlever tous les skins (ajouté après l'initialisation)
+    const removeAllSkinsBtn = document.getElementById("removeAllSkins");
+    if (removeAllSkinsBtn) {
+      removeAllSkinsBtn.addEventListener("click", () => {
+        if (confirm("Êtes-vous sûr de vouloir enlever tous les skins de la boutique ?")) {
+          ownedItems = [];
+          localStorage.setItem("ownedItems", JSON.stringify(ownedItems));
+          updateDisplay();
+          showPopup(
+            "🗑️",
+            "Skins supprimés",
+            "Tous les skins de la boutique ont été enlevés !<br><br>Vous devrez les racheter.",
+            [{
+              text: "Compris",
+              action: "closePopup(this.closest('.popup-overlay'))"
+            }]
+          );
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
