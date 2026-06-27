@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu - Flappy Emoji ✦ Saison 1</title>
+  <!-- SDK Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <style>
+    /* Styles existants de votre menu */
+    :root { --primary: #FFD700; --bg: #0f0f2d; --card: #1e1e3f; }
+    body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+    
+    /* Styles Overlay Connexion */
+    #usernameOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 10, 25, 0.98); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+    .login-card { background: var(--card); padding: 40px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); text-align: center; max-width: 400px; width: 90%; border: 1px solid #333; }
+    .login-card h2 { color: var(--primary); margin-top: 0; font-size: 28px; text-transform: uppercase; letter-spacing: 2px; }
+    .login-card p { color: #aaa; margin-bottom: 30px; line-height: 1.5; }
+    .input-group { margin-bottom: 20px; text-align: left; }
+    .input-group label { display: block; color: #888; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; font-weight: bold; }
+    .login-card input { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid #333; background: #0a0a1a; color: white; font-size: 18px; box-sizing: border-box; }
+    .login-card button { width: 100%; padding: 15px; border-radius: 10px; border: none; background: linear-gradient(45deg, #FFD700, #FFA500); color: #000; font-weight: bold; cursor: pointer; font-size: 18px; margin-top: 10px; }
+    .security-note { margin-top: 25px; font-size: 12px; color: #666; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    
+    /* Reste des styles de votre menu original ici... */
+    #menu { background: var(--card); padding: 30px; border-radius: 20px; width: 90%; max-width: 800px; text-align: center; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .btn { padding: 15px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; }
+    .btn-play { grid-column: span 2; background: #4CAF50; color: white; font-size: 20px; }
+    .leaderboard { margin-top: 20px; background: #0a0a1a; padding: 15px; border-radius: 10px; }
+    table { width: 100%; text-align: left; border-collapse: collapse; }
+    td, th { padding: 10px; border-bottom: 1px solid #222; }
+  </style>
+</head>
+<body>
+
+  <div id="usernameOverlay">
+    <div class="login-card">
+      <h2>✦ Saison 1 ✦</h2>
+      <p>Connectez-vous pour synchroniser vos scores et vos skins sur tous vos écrans.</p>
+      <div class="input-group"><label>Pseudo</label><input type="text" id="usernameInput" placeholder="Ex: FlappyMaster"></div>
+      <div class="input-group"><label>Code PIN (4 chiffres) 🔒</label><input type="password" id="pinInput" placeholder="••••" maxlength="4"></div>
+      <button id="saveUsernameBtn">REJOINDRE LE JEU</button>
+      <div class="security-note">🛡️ Sauvegarde Cloud sécurisée via Firebase</div>
+    </div>
+  </div>
+
+  <div id="menu" style="display:none;">
+    <h1>Flappy Emoji</h1>
+    <p>Joueur : <span id="displayUsername" style="color:var(--primary)"></span> | 🟢 En ligne</p>
+    
+    <div class="grid">
+      <button class="btn btn-play" onclick="window.location.href='interface.html'">JOUER</button>
+      <button class="btn" onclick="window.location.href='passemoji.html'">PASS EMOJI</button>
+      <button class="btn" onclick="window.location.href='boutique.html'">BOUTIQUE</button>
+    </div>
+
+    <div class="leaderboard">
+      <h3>🏆 TOP 10 MONDIAL</h3>
+      <table>
+        <thead><tr><th>#</th><th>Pseudo</th><th>Score</th></tr></thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const usernameOverlay = document.getElementById("usernameOverlay");
+    const usernameInput = document.getElementById("usernameInput");
+    const pinInput = document.getElementById("pinInput");
+    const saveUsernameBtn = document.getElementById("saveUsernameBtn");
+    const menuDiv = document.getElementById("menu");
+    const displayUsername = document.getElementById("displayUsername");
+
+    window.onload = () => {
+      const user = sessionStorage.getItem("currentUsername");
+      const pin = sessionStorage.getItem("currentPin");
+      if (user && pin) login(user, pin);
+    };
+
+    saveUsernameBtn.onclick = async () => {
+      const user = usernameInput.value.trim();
+      const pin = pinInput.value.trim();
+      if (user.length < 2 || pin.length !== 4) return alert("Pseudo ou PIN invalide !");
+      
+      saveUsernameBtn.disabled = true;
+      const res = await syncUserData(user, pin);
+      if (res.success) {
+        sessionStorage.setItem("currentUsername", user);
+        sessionStorage.setItem("currentPin", pin);
+        login(user, pin);
+      } else {
+        alert("Pseudo déjà pris avec un autre PIN.");
+        saveUsernameBtn.disabled = false;
+      }
+    };
+
+    function login(user, pin) {
+      usernameOverlay.style.display = "none";
+      menuDiv.style.display = "block";
+      displayUsername.textContent = user;
+      updateLeaderboard();
+    }
+
+    function updateLeaderboard() {
+      const body = document.getElementById("leaderboardBody");
+      db.ref('leaderboard').orderByChild('score').limitToLast(10).on('value', (snap) => {
+        body.innerHTML = "";
+        const scores = [];
+        snap.forEach(c => scores.push(c.val()));
+        scores.reverse().forEach((s, i) => {
+          const row = `<tr><td>${i+1}</td><td>${s.username}</td><td>${s.score}</td></tr>`;
+          body.innerHTML += row;
+        });
+      });
+    }
+  </script>
+</body>
+</html>

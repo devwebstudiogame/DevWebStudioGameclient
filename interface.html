@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Flappy Emoji - Jeu</title>
+  <!-- SDK Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <style>
+    body { background: #0f0f2d; color: white; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    canvas { background: #87CEEB; border: 4px solid #1e1e3f; border-radius: 15px; }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="320" height="480"></canvas>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const currentUsername = sessionStorage.getItem("currentUsername");
+
+    // --- LOGIQUE JEU (Simplifiée pour l'exemple, gardez votre code original ici) ---
+    let score = 0;
+    let gameRunning = true;
+
+    function onGameOver(finalScore) {
+        if (!currentUsername) return;
+        
+        // Sauvegarde record personnel sur Cloud
+        let best = parseInt(localStorage.getItem("bestScore") || "0");
+        if (finalScore > best) {
+            localStorage.setItem("bestScore", finalScore);
+            cloudSave("bestScore", finalScore);
+        }
+
+        // Ajout au classement mondial
+        db.ref('leaderboard').push({
+            username: currentUsername,
+            score: finalScore,
+            timestamp: Date.now()
+        });
+    }
+
+    // Votre code de jeu complet ici...
+    // Assurez-vous d'appeler onGameOver(score) quand le joueur perd.
+  </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Pass Emoji - Saison 1</title>
+    <!-- SDK Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+    <!-- Votre interface de Pass Emoji... -->
+
+    <script>
+        // --- SYNCHRONISATION DU PASS ---
+        
+        // Dès qu'un emoji est débloqué dans le Pass
+        function unlockPassEmoji(emojiData) {
+            let seenUnlocks = JSON.parse(localStorage.getItem('seenUnlocks') || '[]');
+            const key = `week${emojiData.week}_tier${emojiData.tier}`;
+            
+            if (!seenUnlocks.includes(key)) {
+                seenUnlocks.push(key);
+                localStorage.setItem('seenUnlocks', JSON.stringify(seenUnlocks));
+                
+                // Sauvegarde Cloud de la progression du Pass
+                cloudSave("seenUnlocks", seenUnlocks);
+                
+                // On ajoute aussi l'emoji à la liste globale possédée
+                let emojiList = JSON.parse(localStorage.getItem('emojiList') || '[]');
+                emojiList.push(emojiData);
+                localStorage.setItem('emojiList', JSON.stringify(emojiList));
+                cloudSave("emojiList", emojiList);
+            }
+        }
+
+        // Au chargement du Pass, on s'assure d'avoir les dernières données
+        async function refreshPassData() {
+            const user = sessionStorage.getItem("currentUsername");
+            if (user) {
+                const snapshot = await db.ref('users/' + user).once('value');
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    if (data.seenUnlocks) {
+                        localStorage.setItem('seenUnlocks', JSON.stringify(data.seenUnlocks));
+                    }
+                    // Relancer le rendu du Pass
+                    renderPass();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
